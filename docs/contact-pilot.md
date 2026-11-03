@@ -38,6 +38,7 @@ read -r -s -p "Journal-only password: " JOURNAL_DB_PASSWORD
 echo
 export JOURNAL_DB_PASSWORD
 docker compose -f lab/journal.compose.yaml up -d --wait
+python -m migration_lab.pilot journal-check --lab-only
 python -m migration_lab.pilot init-journal --lab-only
 ```
 
@@ -97,7 +98,9 @@ fixed to the synthetic fixture; arbitrary records are refused.
 ## Failure and interruption handling
 
 Read status before retrying the same apply command with the same label. There
-are no automatic network retries. Durable intent events precede writes. A
+are no automatic Odoo network/write retries. Initial journal connections retry
+only transient startup/timeouts, at most three times; authentication failures
+are not retried. Durable intent events precede writes. A
 successful create whose response is lost is recovered by its stable marker,
 then reconciled, rather than recreated blindly. Duplicate markers are blocked.
 If a previous create intent exists but no marker is visible, the worker stops
@@ -145,3 +148,43 @@ approval/retry workflow or dashboard. Connection/preflight failures can occur
 before a migration run starts and return safe CLI codes. Protected traceback
 storage, production-scale performance, automated cutover/restore recovery and
 backup procedures still require separate implementation and verification.
+
+## Diagnose journal connection problems
+
+A healthy PostgreSQL container is a readiness signal, not proof that the Python
+client has the right password/port. The healthcheck now checks TCP, avoiding
+success from the temporary Unix-socket-only server used during initialization.
+It does not validate credentials. The read-only worker check uses the same
+connection configuration as initialization and performs no schema/data writes:
+
+```bash
+python -m migration_lab.pilot journal-check --lab-only
+```
+
+Expected result: journal_connected. On failure the command reports a static
+category and safe host/port/attempt/exception-type/SQLSTATE metadata, never raw
+libpq messages, passwords or connection strings. Share that output for diagnosis.
+The connection code closes failed connections and bounds transient retries.
+
+- journal_authentication_failed: use the original password stored when this
+  journal volume was initialized. Re-exporting a newly chosen password does not
+  change that stored password. Do not remove/reinitialize the volume to fix it.
+- journal_not_ready or journal_connection_timeout: check journal service status
+  and the actual published TCP port. Compose's updated healthcheck applies on
+  the next normal up/recreation; the existing persistent volume is preserved.
+- invalid_JOURNAL_DB_PORT: export the numeric published port for both worker
+  and Compose. Compose can read its .env while Python only reads exported vars.
+- journal_database_missing/access_denied/TLS errors: diagnose the selected
+  service/permissions/trust configuration; do not bypass verification or recreate
+  databases merely to make the check pass.
+
+Read-only service/port checks (they print no passwords):
+
+```bash
+docker compose -f lab/journal.compose.yaml ps
+docker compose -f lab/journal.compose.yaml port journal 5432
+```
+
+Keep the existing exported journal password while checking. No Odoo connection
+settings are required for journal-check or init-journal. Proceed to seed/sync
+only after journal initialization succeeds.

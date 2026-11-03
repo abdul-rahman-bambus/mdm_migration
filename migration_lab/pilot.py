@@ -197,7 +197,7 @@ def migrate(source, target, journal, spec, source_identity, target_identity, act
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["init-journal", "seed", "sync", "change-source", "status"])
+    parser.add_argument("action", choices=["journal-check", "init-journal", "seed", "sync", "change-source", "status"])
     parser.add_argument("--lab-only", action="store_true", required=True)
     parser.add_argument("--label", default="smoke-001")
     parser.add_argument("--apply", action="store_true", help="Authorize the reviewed synthetic contact write to the target")
@@ -210,9 +210,10 @@ def main(argv=None):
     journal = None
     try:
         journal = Journal.from_environment()
-        if args.action == "init-journal":
-            journal.initialize()
-            result = {"state": "journal_initialized"}
+        if args.action in {"init-journal", "journal-check"}:
+            if args.action == "init-journal":
+                journal.initialize()
+            result = {"state": "journal_initialized" if args.action == "init-journal" else "journal_connected"}
         else:
             source_settings = Settings.from_environment("ODOO12")
             target_settings = Settings.from_environment("ODOO20")
@@ -232,7 +233,10 @@ def main(argv=None):
     except ValueError:
         print(json.dumps({"state": "blocked", "error": "invalid_or_missing_connection_configuration"}))
     except (PilotError, ProbeFailure) as exc:
-        print(json.dumps({"state": "blocked", "error": str(exc)}))
+        result = {"state": "blocked", "error": str(exc)}
+        if getattr(exc, "diagnostics", None):
+            result["diagnostics"] = exc.diagnostics
+        print(json.dumps(result))
     except KeyboardInterrupt:
         print(json.dumps({"state": "interrupted", "next": "retry_same_label_after_reviewing_status"}))
     except Exception:

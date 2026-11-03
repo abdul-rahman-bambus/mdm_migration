@@ -3,11 +3,45 @@
 from contextlib import contextmanager
 import json
 import os
+import re
+import time
 import uuid
 
 
 class PilotError(Exception):
     """Only static, safe error codes belong in this exception."""
+
+    def __init__(self, code, diagnostics=None):
+        super().__init__(code)
+        self.diagnostics = diagnostics or {}
+
+
+def connection_failure(exc):
+    """Inspect libpq's response but return allowlisted labels, never raw text."""
+    state = getattr(exc, "sqlstate", None)
+    state = state if isinstance(state, str) and re.fullmatch(r"[A-Z0-9]{5}", state) else None
+    message = str(exc).lower()
+    if state == "28P01" or "password authentication failed" in message:
+        code = "journal_authentication_failed"
+    elif state == "3D000" or ("database" in message and "does not exist" in message):
+        code = "journal_database_missing"
+    elif state == "28000" or "no pg_hba.conf entry" in message:
+        code = "journal_access_denied"
+    elif "ssl" in message or "certificate verify failed" in message:
+        code = "journal_tls_error"
+    elif "could not translate host name" in message:
+        code = "journal_host_resolution_failed"
+    elif "timeout expired" in message or "connection timed out" in message:
+        code = "journal_connection_timeout"
+    elif state == "57P03" or any(text in message for text in (
+            "connection refused", "server closed the connection unexpectedly",
+            "database system is starting up", "connection reset")):
+        code = "journal_not_ready"
+    else:
+        code = "journal_connection_failed"
+    name = type(exc).__name__
+    name = name if re.fullmatch(r"[A-Za-z0-9_]{1,64}", name) else "Error"
+    return code, {"exception_type": name, "sqlstate": state}
 
 
 DDL = """
@@ -50,23 +84,36 @@ class Journal:
             raise PilotError("missing_JOURNAL_DB_PASSWORD")
         if os.environ.get("JOURNAL_DB_HOST", "127.0.0.1") not in {"127.0.0.1", "localhost", "::1"}:
             raise PilotError("pilot_journal_requires_loopback")
+        host = os.environ.get("JOURNAL_DB_HOST", "127.0.0.1")
         try:
-            connection = psycopg.connect(
-                host=os.environ.get("JOURNAL_DB_HOST", "127.0.0.1"),
-                port=int(os.environ.get("JOURNAL_DB_PORT", "55432")),
-                dbname="bambus_migration_journal", user="bambus_journal",
-                password=os.environ["JOURNAL_DB_PASSWORD"], connect_timeout=10,
-                autocommit=True, row_factory=dict_row,
-            )
-            journal = cls(connection)
-            if connection.execute("SELECT current_database() AS name").fetchone()["name"] != "bambus_migration_journal":
-                connection.close()
-                raise PilotError("journal_database_must_be_independent")
-            return journal
-        except PilotError:
-            raise
-        except Exception:
-            raise PilotError("journal_connection_failed") from None
+            port = int(os.environ.get("JOURNAL_DB_PORT", "55432"))
+            if not 1 <= port <= 65535:
+                raise ValueError()
+        except ValueError:
+            raise PilotError("invalid_JOURNAL_DB_PORT") from None
+        for attempt in range(3):
+            connection = None
+            try:
+                connection = psycopg.connect(
+                    host=host, port=port,
+                    dbname="bambus_migration_journal", user="bambus_journal",
+                    password=os.environ["JOURNAL_DB_PASSWORD"], connect_timeout=5,
+                    autocommit=True, row_factory=dict_row,
+                )
+                if connection.execute("SELECT current_database() AS name").fetchone()["name"] != "bambus_migration_journal":
+                    raise PilotError("journal_database_must_be_independent")
+                return cls(connection)
+            except Exception as exc:
+                if connection is not None:
+                    connection.close()
+                if isinstance(exc, PilotError):
+                    raise
+                code, diagnostics = connection_failure(exc)
+                diagnostics.update(host=host, port=port, attempts=attempt + 1)
+                if attempt < 2 and code in {"journal_not_ready", "journal_connection_timeout"}:
+                    time.sleep(1)
+                    continue
+                raise PilotError(code, diagnostics) from None
 
     def initialize(self):
         with self.connection.transaction():

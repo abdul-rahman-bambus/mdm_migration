@@ -220,3 +220,20 @@ class PostgresPilotTests(unittest.TestCase):
             self.action(apply=True)
         self.assertEqual(len(self.target.rows), 0)
         self.assertTrue(self.journal.has_intent(self.spec["namespace"], "load_intent", "create"))
+
+    def test_wrong_password_returns_safe_authentication_category(self):
+        wrong = "wrong-" + uuid.uuid4().hex
+        with patch.dict(os.environ, {"JOURNAL_DB_PASSWORD": wrong}), self.assertRaisesRegex(PilotError, "journal_authentication_failed") as caught:
+            Journal.from_environment()
+        self.assertNotIn(wrong, json.dumps(caught.exception.diagnostics))
+        self.assertEqual(caught.exception.diagnostics["attempts"], 1)
+
+    def test_journal_check_leaves_history_and_odoo_untouched(self):
+        before = self.journal.status(self.spec["namespace"])
+        calls = len(self.source.calls) + len(self.target.calls)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(main(["journal-check", "--lab-only"]), 0)
+        self.assertEqual(json.loads(output.getvalue())["state"], "journal_connected")
+        self.assertEqual(before, self.journal.status(self.spec["namespace"]))
+        self.assertEqual(calls, len(self.source.calls) + len(self.target.calls))

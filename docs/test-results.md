@@ -6,9 +6,9 @@ Command from `/workspace/mdm_migration`:
 python3 -m unittest discover -s tests -v
 ```
 
-Latest run: **57 tests, 57 passed, 0 failures/errors, 0 skipped**, 3.172 seconds.
-Additional pilot integration suite: **10 tests, 10 passed**, 0 failures/errors/skips,
-9.263 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
+Latest run: **66 tests, 66 passed, 0 failures/errors, 0 skipped**, 3.776 seconds.
+Additional pilot integration suite: **12 tests, 12 passed**, 0 failures/errors/skips,
+10.314 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
 The command ran with loopback socket access outside the command sandbox.
 
 Coverage exercised: environment validation and secret redaction; complete
@@ -69,7 +69,7 @@ mapped target IDs, journal-intent failure before target write, repeatable seed,
 lab endpoint/database restrictions, mapping manifest tampering and phone guards.
 
 Integration command: `.venv/bin/python scripts/run_pilot_integration.py`.
-Ten tests used a real independent PostgreSQL container and two synthetic Odoo
+Twelve tests used a real independent PostgreSQL container and two synthetic Odoo
 XML-RPC HTTP servers. They exercised CLI lifecycle, actual locking and durable
 history, lost source/target create acknowledgements, process interruption/new
 connection retry, read-back mismatch rollback of success/mapping, target loss
@@ -89,3 +89,12 @@ Compose persistent-service startup on the user's computer remains untested.
 Final safety coverage also verifies durable create intent without a visible
 marker blocks a duplicate attempt, including hidden-source/target simulations
 and a real PostgreSQL test of a rejected remote create.
+
+## Journal connection diagnostics
+
+Nine added unit tests cover safe error categories/redaction, SQLSTATE priority,
+transient startup retry, no authentication retry, bounded attempts, invalid
+ports, failed-connection cleanup, read-only CLI checks and safe CLI failures.
+Two added real PostgreSQL tests verify wrong-password categorization without
+secret output and journal-check leaving history/Odoo calls unchanged.
+The connection root cause on the user's local machine remains unconfirmed.

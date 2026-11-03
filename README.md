@@ -129,3 +129,8 @@ The journal uses its own Compose project and persistent volume, preserving
 history independently of the target database. Restore conflicts fail closed.
 The full CLI lifecycle passed against real PostgreSQL and synthetic XML-RPC
 servers; it has not yet been validated against the user's real Odoo instances.
+
+For journal startup failures, run `python -m migration_lab.pilot journal-check
+--lab-only` on one line. It checks connectivity without initialization or Odoo
+calls and returns secret-free error categories. See the troubleshooting section
+of docs/contact-pilot.md; retain the original journal password and volume.

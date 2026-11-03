@@ -129,8 +129,14 @@ one authoritative journal for locking/idempotence. Mark success only after
 read-back reconciliation. Block source/target identity conflicts and target
 restore/missing-mapping situations for review; do not auto-delete/recreate them.
 
-Standard tests: python -m unittest discover -s tests -v (57 tests at this update).
-Optional integration: python scripts/run_pilot_integration.py (10 tests), after
+Standard tests: python -m unittest discover -s tests -v (66 tests at this update).
+Optional integration: python scripts/run_pilot_integration.py (12 tests), after
 installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
 container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
 removes that exact test container. Real Odoo pilot acceptance is still pending.
+
+Journal readiness must use TCP (-h 127.0.0.1), not just the initialization
+Unix socket. journal-check is read-only and does not require Odoo variables.
+Keep connection diagnostics allowlisted and secret-free. Retry only transient
+initial journal connections, at most three times, never authentication failures
+or Odoo writes. Preserve existing volumes/passwords when diagnosing failures.

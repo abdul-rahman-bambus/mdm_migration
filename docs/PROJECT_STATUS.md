@@ -16,8 +16,8 @@ Main is unchanged. Private inventory/review branches must not be pushed.
   environment/model/record identities, payload fingerprints, mapping version,
   transactionally committed reconciliation and PostgreSQL worker locking.
 - Target restore/ID conflicts fail closed; automatic restore recovery is not built.
-- 57 standard tests passed (3.172s), 0 failures/errors/skips.
-- 10 integration tests passed (9.263s), 0 failures/errors/skips, using real
+- 66 standard tests passed (3.776s), 0 failures/errors/skips.
+- 12 integration tests passed (10.314s), 0 failures/errors/skips, using real
   PostgreSQL and synthetic version-12/version-20 XML-RPC HTTP servers.
 - CLI seed/dry-run/apply/rerun/update/status lifecycle passed against those fixtures.
 - Actual PostgreSQL tests exercised locking, lost source/target acknowledgements,
@@ -64,3 +64,18 @@ Seed label smoke-001, review dry-run, explicitly apply, repeat to verify same ta
 ID, then change the source's reserved synthetic phone and apply the update.
 Share safe command output/status. Stop on blocked prerequisites; do not reset
 volumes, delete mappings or bypass reconciliation to make a check pass.
+
+## Journal startup diagnostic correction
+
+Local acceptance is currently blocked at journal connection, before any Odoo
+pilot write. The specific cause is still unconfirmed; the earlier generic code
+hid it. Replaced Unix-socket readiness with TCP readiness and added journal-check
+with allowlisted categories/diagnostics. Startup-only connection retries are
+bounded at three and exclude authentication/configuration failures. Failed
+connections close cleanly. No existing journal password/volume was changed.
+
+Latest validation: 66 standard tests passed (3.776s) and 12 integration tests
+passed (10.314s). Actual wrong-password classification and a history-preserving,
+Odoo-independent journal-check were exercised against owned PostgreSQL. A
+socket-only PostgreSQL probe separately reproduced the old readiness false
+positive. New diagnostics still need execution on the user's computer.

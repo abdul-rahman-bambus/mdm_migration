@@ -11,7 +11,7 @@ services:
     volumes:
       - journal_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bambus_journal -d bambus_migration_journal"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U bambus_journal -d bambus_migration_journal"]
       interval: 2s
       timeout: 5s
       retries: 30

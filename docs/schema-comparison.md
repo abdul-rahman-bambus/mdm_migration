@@ -1,23 +1,35 @@
-# Schema discovery status
+# Observed schema comparison
 
-The local connectivity probe found different field counts on all three core
-models. Counts alone identify no specific renamed, removed or compatible fields.
+The committed `odoo-schema-20261103-122514-132435.json` parses successfully and
+contains all three core models without error entries.
 
-`scripts/export_local_schema.py` requests explicit field metadata for
-product.template, product.product and res.partner. It does not collect business
-records, defaults, attachments or passwords. Only local lab loopback endpoints
-are accepted. Per-model failures remain visible as `error_type` entries.
+| Model | Source | Target | Source-only | Target-only |
+|---|---:|---:|---:|---:|
+| product.template | 75 | 92 | 23 | 40 |
+| product.product | 83 | 111 | 25 | 53 |
+| res.partner | 87 | 116 | 23 | 52 |
 
-Run from a local working directory with the existing exported connection
-variables. It creates `odoo-schema-<UTC timestamp>.json` using exclusive file
-creation. Inspect the JSON and share it for comparison. This script has mocked
-unit coverage; actual local schema exports have not yet been supplied.
+Totals: 245 source field entries, 319 target entries and 390 union entries.
+These are field counts, not business record counts or migration success rates.
 
-Computed status, defaults and API writeability may not be discoverable through
-fields_get. Omitted attributes mean unknown, not false. In particular readonly
-false does not prove create/write permission or safe migration behavior.
+Run from the repository root using a new output directory:
 
-Next: compare actual snapshots conservatively; separately review suspected
-renames, changed selection keys, relational dependencies and required fields.
-The module inventory and dependent-model schemas still need collection.
-No mapping configuration is approved and no comparison report exists yet.
+```sh
+python3 -m migration_lab.schema odoo-schema-20261103-122514-132435.json --output-dir reports/schema-review-1
+```
+
+The command is offline. It emits comparison.json, comparison.md, fields.csv and
+mapping-draft.json. The input SHA-256 is included for provenance. Checked-in
+results are under `docs/schema-reports/odoo12-20-initial/`.
+
+The comparator validates snapshot metadata, compares selection keys independently
+of ordering/labels, flags changed types/relations/required status, and marks
+readonly, related, binary, company-dependent and nonstored fields for review.
+Every source field is accounted for. Same-name scalar candidates remain
+unapproved. Source-only fields are not automatically renamed; target-only fields
+are not silently assigned defaults.
+
+Computed metadata is absent from the supplied snapshot. Defaults and API
+writeability remain unknown. See field-mapping.md for concrete review decisions.
+Next: collect installed modules and dependent-model metadata with the local
+inventory command. No migration writes or reconciliation have occurred.

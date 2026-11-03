@@ -1,0 +1,3579 @@
+{
+  "format_version": 1,
+  "mapping_version": "odoo12-20.lab.v1-draft",
+  "state": "unapproved",
+  "input_sha256": "38c10099945066679442f4d0d27135ad626f1e58838917d408e807769cf45885",
+  "models": {
+    "product.product": {
+      "source_fields": [
+        {
+          "source_field": "__last_update",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "active",
+          "same_name_target_candidate": "active",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "activity_date_deadline",
+          "same_name_target_candidate": "activity_date_deadline",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_ids",
+          "same_name_target_candidate": "activity_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_state",
+          "same_name_target_candidate": "activity_state",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_summary",
+          "same_name_target_candidate": "activity_summary",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_type_id",
+          "same_name_target_candidate": "activity_type_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_user_id",
+          "same_name_target_candidate": "activity_user_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "attribute_line_ids",
+          "same_name_target_candidate": "attribute_line_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "attribute_value_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "barcode",
+          "same_name_target_candidate": "barcode",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "categ_id",
+          "same_name_target_candidate": "categ_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "required_changed",
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "code",
+          "same_name_target_candidate": "code",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "color",
+          "same_name_target_candidate": "color",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "company_id",
+          "same_name_target_candidate": "company_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "cost_currency_id",
+          "same_name_target_candidate": "cost_currency_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "create_date",
+          "same_name_target_candidate": "create_date",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "create_uid",
+          "same_name_target_candidate": "create_uid",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "currency_id",
+          "same_name_target_candidate": "currency_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "default_code",
+          "same_name_target_candidate": "default_code",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "description",
+          "same_name_target_candidate": "description",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "type_changed",
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "description_purchase",
+          "same_name_target_candidate": "description_purchase",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "description_sale",
+          "same_name_target_candidate": "description_sale",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "display_name",
+          "same_name_target_candidate": "display_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "id",
+          "same_name_target_candidate": "id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "image",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_medium",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_small",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_variant",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "is_product_variant",
+          "same_name_target_candidate": "is_product_variant",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "item_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "list_price",
+          "same_name_target_candidate": "list_price",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "lst_price",
+          "same_name_target_candidate": "lst_price",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "store_changed",
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "message_attachment_count",
+          "same_name_target_candidate": "message_attachment_count",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_channel_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_follower_ids",
+          "same_name_target_candidate": "message_follower_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_has_error",
+          "same_name_target_candidate": "message_has_error",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_has_error_counter",
+          "same_name_target_candidate": "message_has_error_counter",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_ids",
+          "same_name_target_candidate": "message_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_is_follower",
+          "same_name_target_candidate": "message_is_follower",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_main_attachment_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_needaction",
+          "same_name_target_candidate": "message_needaction",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_needaction_counter",
+          "same_name_target_candidate": "message_needaction_counter",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_partner_ids",
+          "same_name_target_candidate": "message_partner_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_unread",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_unread_counter",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "name",
+          "same_name_target_candidate": "name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "packaging_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "partner_ref",
+          "same_name_target_candidate": "partner_ref",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "price",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "price_extra",
+          "same_name_target_candidate": "price_extra",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "pricelist_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "pricelist_item_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "product_template_attribute_value_ids",
+          "same_name_target_candidate": "product_template_attribute_value_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "store_changed",
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "product_tmpl_id",
+          "same_name_target_candidate": "product_tmpl_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "product_variant_count",
+          "same_name_target_candidate": "product_variant_count",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "product_variant_id",
+          "same_name_target_candidate": "product_variant_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "product_variant_ids",
+          "same_name_target_candidate": "product_variant_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "purchase_ok",
+          "same_name_target_candidate": "purchase_ok",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "rental",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "sale_ok",
+          "same_name_target_candidate": "sale_ok",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "seller_ids",
+          "same_name_target_candidate": "seller_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "sequence",
+          "same_name_target_candidate": "sequence",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "standard_price",
+          "same_name_target_candidate": "standard_price",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "store_changed",
+            "company_context_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "type",
+          "same_name_target_candidate": "type",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "selection_keys_added",
+            "selection_labels_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "uom_id",
+          "same_name_target_candidate": "uom_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "uom_name",
+          "same_name_target_candidate": "uom_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "uom_po_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_archived_variant_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_existing_variant_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_value_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_value_wnva_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_wnva_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_template_attribute_line_ids",
+          "same_name_target_candidate": "valid_product_template_attribute_line_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "valid_product_template_attribute_line_wnva_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "variant_seller_ids",
+          "same_name_target_candidate": "variant_seller_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "volume",
+          "same_name_target_candidate": "volume",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "weight",
+          "same_name_target_candidate": "weight",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "weight_uom_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "weight_uom_name",
+          "same_name_target_candidate": "weight_uom_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "write_date",
+          "same_name_target_candidate": "write_date",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "write_uid",
+          "same_name_target_candidate": "write_uid",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        }
+      ],
+      "target_only_fields": [
+        {
+          "field": "activity_exception_decoration",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_exception_icon",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_plans_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_type_icon",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "additional_product_tag_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "all_product_tag_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_count",
+          "required": true,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_id",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_name",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_price",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "can_image_1024_be_zoomed",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "can_image_variant_1024_be_zoomed",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "catalog_is_in_order",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "combination_indices",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "combo_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "extra_uom_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "fixed_pricelist_rule_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "free_qty",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "has_configurable_attributes",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "has_message",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_1024",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_128",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_1920",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_256",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_512",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_variant_1024",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_variant_128",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_variant_1920",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_variant_256",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_variant_512",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "import_attribute_values",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "incoming_qty",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_dynamically_created",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_favorite",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_storable",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "message_has_sms_error",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "my_activity_date_deadline",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "outgoing_qty",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "pricelist_rule_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_document_count",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_document_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_properties",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_tag_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_template_variant_value_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_tooltip",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_uom_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "qty_available",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "service_tracking",
+          "required": true,
+          "decision": "unresolved"
+        },
+        {
+          "field": "show_qty_update_button",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "show_sales_price_page",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "uom_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "virtual_available",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "volume_uom_name",
+          "required": false,
+          "decision": "unresolved"
+        }
+      ]
+    },
+    "product.template": {
+      "source_fields": [
+        {
+          "source_field": "__last_update",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "active",
+          "same_name_target_candidate": "active",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "activity_date_deadline",
+          "same_name_target_candidate": "activity_date_deadline",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_ids",
+          "same_name_target_candidate": "activity_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_state",
+          "same_name_target_candidate": "activity_state",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_summary",
+          "same_name_target_candidate": "activity_summary",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_type_id",
+          "same_name_target_candidate": "activity_type_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_user_id",
+          "same_name_target_candidate": "activity_user_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "attribute_line_ids",
+          "same_name_target_candidate": "attribute_line_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "barcode",
+          "same_name_target_candidate": "barcode",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "store_changed",
+            "related_changed",
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "categ_id",
+          "same_name_target_candidate": "categ_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "required_changed",
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "color",
+          "same_name_target_candidate": "color",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "company_id",
+          "same_name_target_candidate": "company_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "cost_currency_id",
+          "same_name_target_candidate": "cost_currency_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "create_date",
+          "same_name_target_candidate": "create_date",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "create_uid",
+          "same_name_target_candidate": "create_uid",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "currency_id",
+          "same_name_target_candidate": "currency_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "default_code",
+          "same_name_target_candidate": "default_code",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "description",
+          "same_name_target_candidate": "description",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "type_changed",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "description_purchase",
+          "same_name_target_candidate": "description_purchase",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "description_sale",
+          "same_name_target_candidate": "description_sale",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "display_name",
+          "same_name_target_candidate": "display_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "id",
+          "same_name_target_candidate": "id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "image",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_medium",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_small",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "is_product_variant",
+          "same_name_target_candidate": "is_product_variant",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "item_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "list_price",
+          "same_name_target_candidate": "list_price",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "lst_price",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_attachment_count",
+          "same_name_target_candidate": "message_attachment_count",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_channel_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_follower_ids",
+          "same_name_target_candidate": "message_follower_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_has_error",
+          "same_name_target_candidate": "message_has_error",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_has_error_counter",
+          "same_name_target_candidate": "message_has_error_counter",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_ids",
+          "same_name_target_candidate": "message_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_is_follower",
+          "same_name_target_candidate": "message_is_follower",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_main_attachment_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_needaction",
+          "same_name_target_candidate": "message_needaction",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_needaction_counter",
+          "same_name_target_candidate": "message_needaction_counter",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_partner_ids",
+          "same_name_target_candidate": "message_partner_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_unread",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_unread_counter",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "name",
+          "same_name_target_candidate": "name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "packaging_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "price",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "pricelist_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "product_variant_count",
+          "same_name_target_candidate": "product_variant_count",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "product_variant_id",
+          "same_name_target_candidate": "product_variant_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "product_variant_ids",
+          "same_name_target_candidate": "product_variant_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "purchase_ok",
+          "same_name_target_candidate": "purchase_ok",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "rental",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "sale_ok",
+          "same_name_target_candidate": "sale_ok",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "seller_ids",
+          "same_name_target_candidate": "seller_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "sequence",
+          "same_name_target_candidate": "sequence",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "standard_price",
+          "same_name_target_candidate": "standard_price",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "type",
+          "same_name_target_candidate": "type",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "selection_keys_added",
+            "selection_labels_changed",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "uom_id",
+          "same_name_target_candidate": "uom_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "uom_name",
+          "same_name_target_candidate": "uom_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "uom_po_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_archived_variant_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_existing_variant_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_value_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_value_wnva_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_attribute_wnva_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "valid_product_template_attribute_line_ids",
+          "same_name_target_candidate": "valid_product_template_attribute_line_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "valid_product_template_attribute_line_wnva_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "variant_seller_ids",
+          "same_name_target_candidate": "variant_seller_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "volume",
+          "same_name_target_candidate": "volume",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "weight",
+          "same_name_target_candidate": "weight",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "weight_uom_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "weight_uom_name",
+          "same_name_target_candidate": "weight_uom_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "write_date",
+          "same_name_target_candidate": "write_date",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "write_uid",
+          "same_name_target_candidate": "write_uid",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        }
+      ],
+      "target_only_fields": [
+        {
+          "field": "activity_exception_decoration",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_exception_icon",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_plans_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_type_icon",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_count",
+          "required": true,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_id",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_name",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "base_unit_price",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "can_image_1024_be_zoomed",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "combo_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "fixed_pricelist_rule_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "free_qty",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "has_configurable_attributes",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "has_message",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_1024",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_128",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_1920",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_256",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_512",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "import_attribute_values",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "incoming_qty",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_dynamically_created",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_favorite",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_storable",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "message_has_sms_error",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "my_activity_date_deadline",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "outgoing_qty",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "pricelist_rule_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_document_count",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_document_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_properties",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_tag_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "product_tooltip",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "qty_available",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "service_tracking",
+          "required": true,
+          "decision": "unresolved"
+        },
+        {
+          "field": "show_qty_update_button",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "show_sales_price_page",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "uom_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "virtual_available",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "volume_uom_name",
+          "required": false,
+          "decision": "unresolved"
+        }
+      ]
+    },
+    "res.partner": {
+      "source_fields": [
+        {
+          "source_field": "__last_update",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "active",
+          "same_name_target_candidate": "active",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "activity_date_deadline",
+          "same_name_target_candidate": "activity_date_deadline",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_ids",
+          "same_name_target_candidate": "activity_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_state",
+          "same_name_target_candidate": "activity_state",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_summary",
+          "same_name_target_candidate": "activity_summary",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_type_id",
+          "same_name_target_candidate": "activity_type_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "relational_mapping_required",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "activity_user_id",
+          "same_name_target_candidate": "activity_user_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "related_changed",
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "additional_info",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "bank_ids",
+          "same_name_target_candidate": "bank_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "barcode",
+          "same_name_target_candidate": "barcode",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "company_dependent_changed",
+            "company_context_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "category_id",
+          "same_name_target_candidate": "category_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "channel_ids",
+          "same_name_target_candidate": "channel_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relation_changed",
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "child_ids",
+          "same_name_target_candidate": "child_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "city",
+          "same_name_target_candidate": "city",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "color",
+          "same_name_target_candidate": "color",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "comment",
+          "same_name_target_candidate": "comment",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "type_changed",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "commercial_company_name",
+          "same_name_target_candidate": "commercial_company_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "related_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "commercial_partner_id",
+          "same_name_target_candidate": "commercial_partner_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "company_id",
+          "same_name_target_candidate": "company_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "company_name",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "company_type",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "contact_address",
+          "same_name_target_candidate": "contact_address",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "country_id",
+          "same_name_target_candidate": "country_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "create_date",
+          "same_name_target_candidate": "create_date",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "create_uid",
+          "same_name_target_candidate": "create_uid",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "credit_limit",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "customer",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "date",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "display_name",
+          "same_name_target_candidate": "display_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "store_changed",
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "email",
+          "same_name_target_candidate": "email",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "email_formatted",
+          "same_name_target_candidate": "email_formatted",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "employee",
+          "same_name_target_candidate": "employee",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "function",
+          "same_name_target_candidate": "function",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "id",
+          "same_name_target_candidate": "id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "im_status",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_medium",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "image_small",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "industry_id",
+          "same_name_target_candidate": "industry_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "is_blacklisted",
+          "same_name_target_candidate": "is_blacklisted",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "is_company",
+          "same_name_target_candidate": "is_company",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "target_readonly",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "lang",
+          "same_name_target_candidate": "lang",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "selection_labels_changed",
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "message_attachment_count",
+          "same_name_target_candidate": "message_attachment_count",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_bounce",
+          "same_name_target_candidate": "message_bounce",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "message_channel_ids",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_follower_ids",
+          "same_name_target_candidate": "message_follower_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_has_error",
+          "same_name_target_candidate": "message_has_error",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_has_error_counter",
+          "same_name_target_candidate": "message_has_error_counter",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_ids",
+          "same_name_target_candidate": "message_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_is_follower",
+          "same_name_target_candidate": "message_is_follower",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_main_attachment_id",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_needaction",
+          "same_name_target_candidate": "message_needaction",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_needaction_counter",
+          "same_name_target_candidate": "message_needaction_counter",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_partner_ids",
+          "same_name_target_candidate": "message_partner_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "readonly_changed",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "message_unread",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "message_unread_counter",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "mobile",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "name",
+          "same_name_target_candidate": "name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "parent_id",
+          "same_name_target_candidate": "parent_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "parent_name",
+          "same_name_target_candidate": "parent_name",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "related_changed",
+            "target_readonly",
+            "related_field_review",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "partner_gid",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "partner_share",
+          "same_name_target_candidate": "partner_share",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "phone",
+          "same_name_target_candidate": "phone",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "property_product_pricelist",
+          "same_name_target_candidate": "property_product_pricelist",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "ref",
+          "same_name_target_candidate": "ref",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "self",
+          "same_name_target_candidate": "self",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "signup_expiration",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "signup_token",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "signup_type",
+          "same_name_target_candidate": "signup_type",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "signup_url",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "signup_valid",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "state_id",
+          "same_name_target_candidate": "state_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "street",
+          "same_name_target_candidate": "street",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "street2",
+          "same_name_target_candidate": "street2",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "supplier",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "title",
+          "same_name_target_candidate": null,
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "source_only"
+          ]
+        },
+        {
+          "source_field": "type",
+          "same_name_target_candidate": "type",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "selection_keys_removed",
+            "selection_labels_changed",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "tz",
+          "same_name_target_candidate": "tz",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "selection_keys_removed",
+            "selection_keys_added",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "tz_offset",
+          "same_name_target_candidate": "tz_offset",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "nonstored_field_review",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "user_id",
+          "same_name_target_candidate": "user_id",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "user_ids",
+          "same_name_target_candidate": "user_ids",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "relational_mapping_required",
+            "computed_status_unknown"
+          ]
+        },
+        {
+          "source_field": "vat",
+          "same_name_target_candidate": "vat",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "website",
+          "same_name_target_candidate": "website",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        },
+        {
+          "source_field": "write_date",
+          "same_name_target_candidate": "write_date",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "write_uid",
+          "same_name_target_candidate": "write_uid",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "target_readonly",
+            "relational_mapping_required",
+            "computed_status_unknown",
+            "system_field_do_not_copy"
+          ]
+        },
+        {
+          "source_field": "zip",
+          "same_name_target_candidate": "zip",
+          "approved_target": null,
+          "transformation": null,
+          "decision": "unresolved",
+          "review_flags": [
+            "computed_status_unknown",
+            "same_name_scalar_candidate"
+          ]
+        }
+      ],
+      "target_only_fields": [
+        {
+          "field": "active_lang_count",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_exception_decoration",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_exception_icon",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_plans_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "activity_type_icon",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "additional_identifiers",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "address",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "address_inline",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "application_statistics",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "available_additional_identifiers_metadata",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "avatar_1024",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "avatar_128",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "avatar_1920",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "avatar_256",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "avatar_512",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "channel_member_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "city_id",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "complete_name",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "contact_address_inline",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "country_code",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "country_enforce_cities",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "email_normalized",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "has_message",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "has_vat",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_1024",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_128",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_1920",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_256",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "image_512",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_in_call",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_pricelist_manually_set",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "is_public",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "main_user_id",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "message_has_sms_error",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "my_activity_date_deadline",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "partner_latitude",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "partner_longitude",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "phone_blacklisted",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "phone_formatted",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "phone_mobile_search",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "phone_sanitized",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "phone_sanitized_blacklisted",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "properties",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "properties_base_definition_id",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "rtc_session_ids",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "same_vat_partner_id",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "specific_property_product_pricelist",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "street_name",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "street_number",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "street_number2",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "type_address_label",
+          "required": false,
+          "decision": "unresolved"
+        },
+        {
+          "field": "vat_label",
+          "required": false,
+          "decision": "unresolved"
+        }
+      ]
+    }
+  }
+}

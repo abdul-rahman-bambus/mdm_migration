@@ -6,7 +6,7 @@ Command from `/workspace/mdm_migration`:
 python3 -m unittest discover -s tests -v
 ```
 
-Latest run: **18 tests, 18 passed, 0 failures/errors, 0 skipped**, 2.675 seconds.
+Latest run: **34 tests, 34 passed, 0 failures/errors, 0 skipped**, 5.155 seconds.
 The command ran with loopback socket access outside the command sandbox.
 
 Coverage exercised: environment validation and secret redaction; complete
@@ -33,3 +33,18 @@ Subsequent user-local inline probe: both real servers authenticated and returned
 metadata/sample reads. See local-connectivity-evidence.md. This does not change
 the automated test count and does not validate the downloadable checker on real
 servers. The screenshots establish local, not cloud, connectivity.
+
+## Latest schema and inventory validation
+
+The added comparator tests exercise full field accounting, structural changes,
+selection order/labels/removed keys, unknown writeability, protected fields,
+invalid snapshots, input immutability, output preservation, unapproved drafts,
+and regressions against the supplied real 245/319-field snapshot. Inventory
+mock tests exercise pagination, dependent-model failures, repeated pages,
+page limits and authentication gating. No real local inventory has run yet.
+
+`LAB_PG12_PASSWORD=validation-placeholder LAB_PG20_PASSWORD=validation-placeholder docker compose -f lab/odoo_migration_lab/compose.yaml config --quiet` passed.
+The placeholders were only for syntax validation, not authentication.
+`bash -n lab/odoo_migration_lab/install.sh` passed. These establish configuration
+and shell syntax only; they do not validate source cloning, legacy builds,
+startup, initialization or migration behavior.

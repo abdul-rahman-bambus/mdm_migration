@@ -45,3 +45,22 @@ created, and no service, database or volume was modified.
 
 Current readiness: Python development and fixture testing work. Live Odoo
 assessment, schema discovery and migration testing are blocked by missing access.
+
+## Subsequent development-branch assessment
+
+The user's upload landed on remote main at 8aa2ec5. Its files were imported into
+development after sanitization; the original main history was not rewritten.
+Compose, both Dockerfiles, the installer and lab README are now present. The
+source clones are not tracked/present here; install.sh clones Odoo branches 12.0
+and 20.0 without commit pins. No heavy rebuild was run because the user's lab
+already runs locally and live cloud access remains unavailable.
+
+Compose configuration validation and installer shell syntax checks passed.
+These are not build/startup tests. Existing tracked build logs were preserved;
+new logs and nested source clones are ignored. The supplied configuration originally contained lab password literals; values
+were not copied into reports. Those literals have now been replaced with required
+LAB_PG12_PASSWORD/LAB_PG20_PASSWORD variables, without changing existing databases.
+Source pinning and verified cloud builds remain operational hardening work. No database, source code mount, container or volume was reset.
+
+The committed core-model export has been compared; see schema-comparison.md.
+User-local connectivity evidence remains separate from cloud connectivity.

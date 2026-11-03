@@ -18,6 +18,8 @@ are out of scope without separate approval. No production access is authorized.
 ## Structure and environment
 
 - `migration_lab/`: dependency-free Python assessment CLI, currently read-only.
+- `migration_lab/schema.py`: offline comparison and unapproved mapping drafts.
+- `migration_lab/inventory.py`: read-only local module/dependency inventory.
 - `tests/`: unittest tests using synthetic loopback XML-RPC fixtures.
 - `scripts/export_local_schema.py`: portable loopback-only metadata exporter.
 - `.env.example`: variable names and non-secret lab defaults only.
@@ -28,8 +30,16 @@ Expected external lab services: odoo12 (Odoo 12 Community, port 8012), pg12
 (PostgreSQL 12), odoo20 (claimed Odoo 20 Community, port 8020), pg20
 (PostgreSQL 16). Databases: odoo12_demo and odoo20_migration; documented DB
 user: odoo. These are supplied specifications, not verified running versions.
-The user says this lab is local. No compose files, volumes or containers are
-present in this cloud checkout. Do not fabricate or replace that lab.
+The lab is local. Compose files and Dockerfiles are now tracked under
+`lab/odoo_migration_lab/`; source clones and existing volumes remain local.
+No Odoo containers have been started in this cloud task. Do not replace that lab.
+Compose/installer require LAB_PG12_PASSWORD and LAB_PG20_PASSWORD with no defaults.
+For existing volumes use their current passwords; changing environment variables
+does not rotate database credentials. Inventory requires no container restart.
+Develop and push on `development`; leave `main` unchanged. The user's lab upload
+originally landed on main; its sanitized files were imported into development.
+Do not push codex/development-before-cleanup; it preserves the earlier local
+ancestry containing uploaded password literals. Remote main was not rewritten.
 
 ## Architecture and conventions
 
@@ -73,15 +83,18 @@ prerequisites. Real migration tests must use synthetic data only.
 
 ## Status and handover
 
-Implemented: assessment CLI, safe configuration validation, bounded read-only
-XML-RPC probes and synthetic protocol tests. Not implemented: migration writes,
-schema comparison, journal, mappings, reconciliation, dashboard and recovery.
+Implemented: assessment CLI, bounded read-only XML-RPC probes, offline schema
+comparison, complete unapproved mapping draft and module/dependency inventory
+tooling. Not implemented: migration writes, approved mappings, journal,
+reconciliation, dashboard and recovery.
 User-local screenshot evidence confirms XML-RPC authentication, server-reported
 versions 12.0/20.0, and metadata/sample reads on three models. See
 docs/local-connectivity-evidence.md; this is not a cloud integration test.
 Cloud-to-local access and credential bindings remain unavailable here.
-Next: export actual field definitions and installed modules from the local lab,
-then design adapters and schema comparison against observed behavior.
+The core schema export is committed and compared under docs/schema-reports/.
+Next: run `python3 -m migration_lab.inventory --output-dir reports/local-inventory-1`
+locally with the existing exported variables. Missing dependency models remain
+explicit partial results. Review module differences before deciding field maps.
 
 Update README when setup/usage changes, this file when operational rules change,
 and docs/PROJECT_STATUS.md after every meaningful implementation step. Record

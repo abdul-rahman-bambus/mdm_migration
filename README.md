@@ -2,8 +2,9 @@
 
 Generic migration preparation for a future MDM project. The specified lab is
 Odoo 12 Community → Odoo 20 Community; the final production target is unconfirmed.
-This repository currently provides **read-only connectivity assessment**, not a
-working data migration engine. The existing Odoo lab is on the user's local
+This repository provides **read-only connectivity, inventory and offline schema
+comparison**, not a working migration engine. Develop on `development`.
+The existing Odoo lab is on the user's local
 machine and is not connected to this cloud environment.
 
 ## Run the current tooling
@@ -47,13 +48,14 @@ core models using those same variables and loopback endpoints. Run it locally
 with `python3 scripts/export_local_schema.py` once that file is available there.
 It writes a new timestamped `odoo-schema-*.json` file without overwriting existing
 files. Inspect any `error_type` entries before treating an export as complete.
-It has mock-based tests but has not yet run against the real local lab.
+A core schema export from the local lab is now committed. The installed-module and dependent-model inventory is still pending.
 
 ## Current lab and planned architecture
 
 The supplied local path is `~/odoo/workspace/mdm_migration/lab/odoo_migration_lab`.
-Its Compose configuration is absent here; there are no verified startup or
-database initialization commands to publish yet. Do not reset its databases or
+Its Compose files, Dockerfiles and installer are now tracked here. Compose
+validation and installer shell syntax checks passed; full cloud builds and
+startup have not been run. Do not reset its databases or
 remove its volumes. Localhost in this cloud workspace refers to the cloud
 machine, not the user's computer.
 
@@ -64,7 +66,7 @@ background retry requests. See [architecture](docs/architecture.md).
 
 ## Development status
 
-Product/partner/image/attachment migration, chatter preservation, schema mapping,
+Product/partner/image/attachment migration, chatter preservation, approved schema mapping,
 ID tracking, journal, reconciliation, fixes/retries, exports and the dashboard
 are planned. There are no migration, database initialization, addon installation
 or retry commands yet. No real migration or performance results exist.
@@ -78,3 +80,33 @@ Read [environment assessment](docs/environment-assessment.md),
 [future MDM readiness](docs/future-mdm-readiness.md), and
 [current status](docs/PROJECT_STATUS.md) before continuing. Documentation for each
 migration area will be added with its implementation and verified procedures.
+
+## Compare schemas and collect local inventory
+
+The supplied snapshot covers 245 source fields and 319 target fields. Tested
+comparison command (use a new output directory for each run):
+
+```sh
+python3 -m migration_lab.schema odoo-schema-20261103-122514-132435.json --output-dir reports/schema-review-1
+```
+
+Outputs: comparison.json, comparison.md, fields.csv and mapping-draft.json.
+The [initial report](docs/schema-reports/odoo12-20-initial/comparison.md) is checked
+in. Matching field names/types are candidates only; all mappings are unapproved.
+
+Next, run locally with both applications running and the same eight exported
+connection variables:
+
+```sh
+python3 -m migration_lab.inventory --output-dir reports/local-inventory-1
+```
+
+Share `reports/local-inventory-1/inventory.json`. This only reads installed module
+names and metadata for 15 dependent models. Exit 1 can mean partial evidence;
+errors remain explicit and the report is still useful. Pagination is bounded.
+This inventory command has mocked tests but has not run against the real lab.
+
+Compose/installer startup now requires exported LAB_PG12_PASSWORD and
+LAB_PG20_PASSWORD matching the existing lab databases; see the lab README.
+The inventory command only needs the eight ODOO variables and does not require
+restarting existing containers.

@@ -1,65 +1,75 @@
 # Project status
 
 Latest update: 2026-11-03 (Asia/Kolkata).
-Branch: `work`. Assessed base/current pre-implementation commit:
-`2ad4ef885a241dc66e6cfe4945f937f76cc74ad0`.
-The implementation is committed after this status file is written; obtain its
-exact revision with `git log -1 --format=%H` rather than treating the baseline
-above as the implementation commit.
+Active branch: `development`. Clean framework base for this increment:
+`6db69b3`. Uploaded lab/schema source: remote main commit `8aa2ec5`.
+Use `git log -1 --format=%H` for the latest implementation commit.
 
 ## Completed and verified
 
-- Inspected available repository, tools, Docker daemon and expected local ports.
-- Read-only assessment CLI, validated with synthetic XML-RPC fixtures.
-- Configuration validation, bounded requests, authentication checks, metadata
-  and ID-only sample reads, sanitized errors and explicit blocked outcomes.
-- Initial AGENTS, README, architecture, assessment, connectivity, limitations,
-  test evidence and future MDM documentation.
-- User-local screenshot evidence: both servers authenticated via XML-RPC and
-  supplied metadata for templates, variants and partners. See
-  local-connectivity-evidence.md for field counts and sample limitations.
-- Standalone core-model schema exporter, verified with mocked RPC responses;
-  real schema export and comparison remain outstanding.
+- Fetched the user's lab upload and core schema snapshot. The upload was on
+  main (`8aa2ec5`), so its files were imported into development alongside the
+  framework after sanitization; main itself was not modified. Earlier unpublished
+  branch history is retained locally under codex/development-before-cleanup.
+- Inspected Compose, Dockerfiles, installer, lab README and exported metadata.
+- Offline comparison accounts for 245 source fields and 319 target fields
+  across three models (390 union entries). Reports are checked in under
+  docs/schema-reports/odoo12-20-initial, including input checksum provenance.
+- Versioned, unapproved mapping draft accounts for every source field and
+  target-only field. No mapping is approved and no business record was written.
+- Read-only installed-module/dependency inventory command implemented and
+  tested with mocks, including pagination, repeated pages and partial failures.
+- 34 automated tests passed, 0 failures/errors/skips (5.155s).
+- Compose configuration validation (with non-secret validation placeholders)
+  and installer bash syntax validation passed.
+- Replaced uploaded Compose/installer password literals with required exported
+  LAB_PG12_PASSWORD and LAB_PG20_PASSWORD. Existing containers/databases were not
+  changed; existing volumes require their current passwords. Automatic approval
+  review rejected earlier push attempts because literals remained in ancestry.
+  This development history was rebuilt from the clean framework base, importing
+  the sanitized final files. Original uploaded history on remote main is unchanged.
 
-## Partial
+## Partial / awaiting local evidence
 
-- Phase 1: cloud assessment complete; the actual user-local lab is inaccessible.
-- Phase 2: read-only XML-RPC probe exists. General version-specific connection
-  adapters and live integration verification are not complete.
+The user-local screenshots establish authentication, server-reported versions
+12.0/20.0, field metadata access and sample reads on core models. The supplied
+schema snapshot establishes actual field definitions but not defaults, computed
+status or API writeability. The cloud task still cannot reach the local lab.
+
+Installed modules and 15 dependent-model definitions must be collected using
+the new inventory command. Missing models will remain explicit partial results.
+No cloud Odoo build, startup, database initialization or migration was attempted.
+The expected source clones are absent here; installer clone steps and legacy
+build dependencies have not been verified in this cloud environment.
+
+## Mapping blockers found
+
+Text-to-HTML changes, image-family changes, source-only purchase UoM, partner
+mobile/customer/supplier fields, readonly partner is_company, absent company_type,
+removed private address selection, new required product fields, and variant
+relationships require decisions. Do not assume missing customer/supplier fields
+map to ranks: those rank fields are absent in this target snapshot too.
+See docs/field-mapping.md for migration impacts.
 
 ## Not started
 
-Schema comparison, reviewed field maps, independent PostgreSQL journal,
-persistent ID mappings, business record migrations, binary migration, chatter
-feasibility, reconciliation, approved corrections/retries, Odoo control addon,
-failure recovery simulations and performance measurement.
+Approved transformations, independent PostgreSQL journal, persistent ID mappings,
+business record migration, binary migration/validation, chatter feasibility,
+reconciliation, correction/retry workflow, control addon, recovery simulations
+and migration performance measurement.
 
-## Test evidence
-
-Latest unittest run: 18 executed, 18 passed, 0 failed, 0 skipped (2.675s).
-CLI help passed. Configuration-only assessment exits 1 as expected because all
-eight connection variables are missing in the cloud. Both cloud-local HTTP probes
-failed with connection refused. The user subsequently ran a separate inline
-probe locally: authentication and metadata/sample reads succeeded on both real
-servers. These are screenshot-reported results, not direct cloud tests.
-No real migration was attempted; latest successful migration and reconciliation:
-**none**. No measured migration performance exists.
-
-## Environment and blockers
-
-Python 3.12.14 and Docker 28.4.0 are available. No Docker containers or lab
-configuration exist in this checkout; the documented home-relative path is
-absent. The user confirmed the Odoo lab is local to their machine. No private
-access route or Odoo credential bindings are configured. Local servers report
-versions 12.0 and 20.0 with functioning XML-RPC. Source provenance, full schemas,
-modules and database/filestore configuration remain unknown.
-
-Known implementation defects: none identified by the current tests; this does
-not establish real Odoo compatibility. Missing functionality is listed above.
+Latest successful migration run: none. Latest reconciliation: none.
+Environment limitations are distinct from the tested offline capabilities above.
 
 ## Next task
 
-Export actual field definitions and installed module names from the local lab
-using the same authenticated read-only route. Obtain existing lab configuration
-without secrets. Compare schemas before migration writes. A supported direct
-cloud connection remains optional if local execution supplies the evidence.
+On the local machine, pull development and run:
+
+```sh
+python3 -m migration_lab.inventory --output-dir reports/local-inventory-1
+```
+
+Use the existing securely exported ODOO12/ODOO20 variables. Share inventory.json
+from that directory even if exit status is 1; partial errors need diagnosis.
+Do not restart services, rerun the installer or reset any database for this check.
+Use a new output directory for each subsequent inventory run.

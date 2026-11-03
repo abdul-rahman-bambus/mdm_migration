@@ -6,3 +6,5 @@ __pycache__/
 *.py[cod]
 reports/
 .coverage
+*.log
+/lab/odoo_migration_lab/source/

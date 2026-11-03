@@ -17,7 +17,11 @@ are out of scope without separate approval. No production access is authorized.
 
 ## Structure and environment
 
-- `migration_lab/`: dependency-free Python assessment CLI, currently read-only.
+- `migration_lab/`: standard-library assessment tools plus the scoped contact pilot.
+- `migration_lab/pilot.py`: explicit synthetic-only seed/dry-run/apply/update worker.
+- `migration_lab/journal.py`: PostgreSQL journal; pilot dependency is optional.
+- `mappings/`: versioned, scope-checked synthetic pilot mapping manifest.
+- `lab/journal.compose.yaml`: independent PostgreSQL project/volume for the journal.
 - `migration_lab/schema.py`: offline comparison and unapproved mapping drafts.
 - `migration_lab/inventory.py`: read-only local module/dependency inventory.
 - `tests/`: unittest tests using synthetic loopback XML-RPC fixtures.
@@ -33,7 +37,7 @@ user: odoo. These are supplied specifications, not verified running versions.
 The lab is local. Compose files and Dockerfiles are now tracked under
 `lab/odoo_migration_lab/`; source clones and existing volumes remain local.
 No Odoo containers have been started in this cloud task. Do not replace that lab.
-Compose/installer require LAB_PG12_PASSWORD and LAB_PG20_PASSWORD with no defaults.
+Odoo Compose/installer require LAB_PG12_PASSWORD and LAB_PG20_PASSWORD with no defaults.
 For existing volumes use their current passwords; changing environment variables
 does not rotate database credentials. Inventory requires no container restart.
 Develop and push on `development`; leave `main` unchanged. The user's lab upload
@@ -85,8 +89,10 @@ prerequisites. Real migration tests must use synthetic data only.
 
 Implemented: assessment CLI, bounded read-only XML-RPC probes, offline schema
 comparison, complete unapproved mapping draft and module/dependency inventory
-tooling. Not implemented: migration writes, approved mappings, journal,
-reconciliation, dashboard and recovery.
+tooling. The synthetic-contact pilot now implements explicit writes, persistent
+ID mapping, journal events and read-back reconciliation. General business-data
+migration, broader approved mappings, dashboard and target-restore recovery
+remain unimplemented.
 User-local screenshot evidence confirms XML-RPC authentication, server-reported
 versions 12.0/20.0, and metadata/sample reads on three models. See
 docs/local-connectivity-evidence.md; this is not a cloud integration test.
@@ -105,3 +111,26 @@ changes when permitted; never claim unexecuted checks passed.
 
 Do not push codex/inventory-review-local: it retains uploaded inventory and
 detailed environment evidence that has not been authorized for publication.
+
+## Synthetic contact pilot rules
+
+See docs/contact-pilot.md and docs/migration-tracking.md. Commands require
+--lab-only; target writes additionally require sync --apply. Source seed and
+change-source explicitly write only the marked synthetic fixture. The pilot is
+restricted to loopback ports 8012/8020 and documented laboratory database names.
+Fields: name/email/phone; ref is the stable marker. Do not expand this scope by
+editing only the manifest; code verifies the manifest matches its allowlist.
+
+Use a separate PostgreSQL journal, never an Odoo database. Journal credentials
+must be supplied through JOURNAL_DB_PASSWORD; do not add defaults. Start only
+lab/journal.compose.yaml for the journal, preserving existing Odoo services.
+Never remove its volume or erase failed/incomplete runs. All workers must share
+one authoritative journal for locking/idempotence. Mark success only after
+read-back reconciliation. Block source/target identity conflicts and target
+restore/missing-mapping situations for review; do not auto-delete/recreate them.
+
+Standard tests: python -m unittest discover -s tests -v (57 tests at this update).
+Optional integration: python scripts/run_pilot_integration.py (10 tests), after
+installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
+container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
+removes that exact test container. Real Odoo pilot acceptance is still pending.

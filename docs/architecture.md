@@ -39,3 +39,15 @@ as target relationships. Migration workers own writes and authorized retries.
 The web addon must not execute arbitrary shell commands. Logs retain protected
 diagnostic references, not passwords or unnecessary personal data. Historical
 chatter support and production target version are unresolved decisions.
+
+## Synthetic contact pilot increment
+
+The separately guarded pilot adds explicit res.partner writes for a known
+synthetic record, backed by an independent PostgreSQL journal. Standard
+assessment clients remain read-only. Name/email/phone are the only payload
+fields and ref is a deterministic technical marker. Versioned manifest and
+runtime scope must agree. A journal session lock, durable intents and target
+marker handle interrupted create retries; reconciliation is committed atomically
+with the last-successful mapping in PostgreSQL. There is no cross-system
+transaction. Restore conflicts fail closed. See migration-tracking.md and
+contact-pilot.md; the wider planned architecture above is still incomplete.

@@ -2,15 +2,17 @@
 
 Generic migration preparation for a future MDM project. The specified lab is
 Odoo 12 Community → Odoo 20 Community; the final production target is unconfirmed.
-This repository provides **read-only connectivity, inventory and offline schema
-comparison**, not a working migration engine. Develop on `development`.
+This repository provides connectivity/inventory/schema tooling and a **limited
+synthetic-contact migration pilot** with an independent PostgreSQL journal.
+The broader migration engine remains in development. Use `development`.
 The existing Odoo lab is on the user's local
 machine and is not connected to this cloud environment.
 
 ## Run the current tooling
 
-Requirements: Python 3.12 (tested with 3.12.14). No third-party packages or
-installation are required for the current module. From the repository root:
+Requirements: Python 3.12 (tested with 3.12.14). Assessment/schema tools and unit
+tests use the standard library. The optional contact pilot needs the pinned
+packages in requirements-pilot.txt and a separate PostgreSQL journal. From the repository root:
 
 ```sh
 python3 -m unittest discover -s tests -v
@@ -67,9 +69,10 @@ background retry requests. See [architecture](docs/architecture.md).
 ## Development status
 
 Product/partner/image/attachment migration, chatter preservation, approved schema mapping,
-ID tracking, journal, reconciliation, fixes/retries, exports and the dashboard
-are planned. There are no migration, database initialization, addon installation
-or retry commands yet. No real migration or performance results exist.
+general ID tracking, multi-model reconciliation, approval workflows, exports
+and the dashboard remain planned. The pilot implements single synthetic-contact
+ID mapping, history and reconciliation; real Odoo acceptance is still pending.
+No real migration or migration performance results exist.
 
 Connection failures are categorized as configuration, network, timeout, HTTP,
 RPC, response or version problems. Raw fault details are deliberately omitted.
@@ -109,7 +112,20 @@ Updated core-refresh and registry-diagnostic behavior has automated mock coverag
 live behavior still needs validation. When core reads succeed, schema.json is
 exported from the same collection run, even if a dependency check is partial.
 
-Compose/installer startup now requires exported LAB_PG12_PASSWORD and
+Original Odoo Compose/installer startup now requires exported LAB_PG12_PASSWORD and
 LAB_PG20_PASSWORD matching the existing lab databases; see the lab README.
 The inventory command only needs the eight ODOO variables and does not require
 restarting existing containers.
+
+## Run the first synthetic contact migration
+
+Follow [the local pilot runbook](docs/contact-pilot.md). It includes exact
+installation, journal startup, seed, dry-run, apply, rerun and update commands.
+Only name/email/phone are mapped, with ref reserved for a technical marker.
+`sync` defaults to dry-run; `--apply` explicitly enables the target write.
+It refuses arbitrary business contacts and remote/production endpoints.
+
+The journal uses its own Compose project and persistent volume, preserving
+history independently of the target database. Restore conflicts fail closed.
+The full CLI lifecycle passed against real PostgreSQL and synthetic XML-RPC
+servers; it has not yet been validated against the user's real Odoo instances.

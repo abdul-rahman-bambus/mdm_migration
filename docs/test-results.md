@@ -6,7 +6,9 @@ Command from `/workspace/mdm_migration`:
 python3 -m unittest discover -s tests -v
 ```
 
-Latest run: **41 tests, 41 passed, 0 failures/errors, 0 skipped**, 4.675 seconds.
+Latest run: **57 tests, 57 passed, 0 failures/errors, 0 skipped**, 3.172 seconds.
+Additional pilot integration suite: **10 tests, 10 passed**, 0 failures/errors/skips,
+9.263 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
 The command ran with loopback socket access outside the command sandbox.
 
 Coverage exercised: environment validation and secret redaction; complete
@@ -57,3 +59,33 @@ registry visibility/access failure diagnostics, export of complete core metadata
 alongside partial dependency results, and refusal to export incomplete core
 schemas. Updated live probes have not been run against actual servers here.
 User-uploaded detailed environment reports are retained locally, not published.
+
+## Synthetic contact pilot
+
+Added unit coverage: dry-run zero target writes, explicit apply and idempotent
+reruns, controlled update, lost response recovery, interrupted-run continuation,
+failed read-back preventing reconciliation, synthetic guard, missing/reused
+mapped target IDs, journal-intent failure before target write, repeatable seed,
+lab endpoint/database restrictions, mapping manifest tampering and phone guards.
+
+Integration command: `.venv/bin/python scripts/run_pilot_integration.py`.
+Ten tests used a real independent PostgreSQL container and two synthetic Odoo
+XML-RPC HTTP servers. They exercised CLI lifecycle, actual locking and durable
+history, lost source/target create acknowledgements, process interruption/new
+connection retry, read-back mismatch rollback of success/mapping, target loss
+while retaining the journal, and repeatable initialization. HTTP fixtures used
+ephemeral loopback ports; CLI endpoint identity was patched only in that test,
+while normal runtime endpoint restrictions are separately unit tested.
+
+The owned PostgreSQL test container used tmpfs and no named volume and was
+removed after each test suite. No actual Odoo database, container or persistent
+journal was used. Actual Odoo create/write/notification compatibility remains
+unverified. No local client data or detailed environment inventory was published.
+
+Pinned requirements installation and `.venv/bin/python -m pip check` passed.
+Journal Compose config validation with a non-secret placeholder passed; actual
+Compose persistent-service startup on the user's computer remains untested.
+
+Final safety coverage also verifies durable create intent without a visible
+marker blocks a duplicate attempt, including hidden-source/target simulations
+and a real PostgreSQL test of a rejected remote create.

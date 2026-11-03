@@ -1,0 +1,19 @@
+name: bambus-migration-journal
+services:
+  journal:
+    image: postgres:16@sha256:5db6dac2ef5dcff512f4f00a009c3c332b9f2f28f24277175bf3e4a3d02ef83a
+    environment:
+      POSTGRES_USER: bambus_journal
+      POSTGRES_DB: bambus_migration_journal
+      POSTGRES_PASSWORD: ${JOURNAL_DB_PASSWORD:?Export a journal-only password}
+    ports:
+      - "127.0.0.1:${JOURNAL_DB_PORT:-55432}:5432"
+    volumes:
+      - journal_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bambus_journal -d bambus_migration_journal"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+volumes:
+  journal_data:

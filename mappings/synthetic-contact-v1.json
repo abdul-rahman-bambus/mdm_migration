@@ -1,0 +1,11 @@
+{
+  "mapping_version": "synthetic-contact-v1",
+  "scope": "synthetic-lab-only",
+  "source_model": "res.partner",
+  "target_model": "res.partner",
+  "fields": [
+    {"source": "name", "target": "name", "transform": "identity"},
+    {"source": "email", "target": "email", "transform": "identity"},
+    {"source": "phone", "target": "phone", "transform": "identity"}
+  ]
+}

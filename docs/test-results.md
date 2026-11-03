@@ -6,9 +6,9 @@ Command from `/workspace/mdm_migration`:
 python3 -m unittest discover -s tests -v
 ```
 
-Latest run: **72 tests, 72 passed, 0 failures/errors, 0 skipped**, 4.695 seconds.
-Additional pilot integration suite: **15 tests, 15 passed**, 0 failures/errors/skips,
-13.558 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
+Latest run: **78 tests, 78 passed, 0 failures/errors, 0 skipped**, 4.244 seconds.
+Additional pilot integration suite: **16 tests, 16 passed**, 0 failures/errors/skips,
+14.278 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
 The command ran with loopback socket access outside the command sandbox.
 
 Coverage exercised: environment validation and secret redaction; complete
@@ -109,3 +109,28 @@ pilot payload, missing defaults block before intent and can be corrected without
 history resets, and existing records can be read/updated without create checks.
 Latest results: 72 standard tests and 15 integration tests passed. Real local
 Odoo defaults and writes are not claimed verified by these synthetic tests.
+
+## Odoo 20 tracking UI
+
+Native Odoo runner reported 22 tests, 0 failures/errors. Real Chromium smoke
+checks passed: overview metrics/CSS, run/record/mapping/issue lists, read-only
+controls, record drill-down and marker-verified navigation into the actual
+synthetic target contact. No page errors were reported.
+
+The owned Odoo/PostgreSQL environment used a synthetic Odoo 12 source and actual
+Odoo 20 target. The pilot's seven execution attempts generated real journal
+metadata; one record, one last-successful mapping and one historical failure
+were shown accurately. The separate monitor did not change res.partner count.
+Repeat import returned unchanged. No existing user lab resource was used.
+
+Added standard tests validate strict metadata/UUID/timestamp/page contracts,
+no business payloads, closed monitor methods and clear role failures. Added
+PostgreSQL test verifies source SQL READ ONLY enforcement, stable identity and
+unchanged-import behavior. Native tests cover Viewer/importer/outsider access,
+context forgery/direct mutation rejection, snapshot completeness/immutability,
+resume, stale/empty cases, current failure vs past mapping, required evidence,
+manifest counts, timestamp precision/search and target marker checking.
+
+Command: .venv/bin/python scripts/run_control_integration.py. Logs/screenshots
+are redacted and ignored under reports/control-integration/. Actual installation
+and permission assignment on the user's running Odoo lab still need acceptance.

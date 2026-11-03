@@ -50,7 +50,8 @@ core models using those same variables and loopback endpoints. Run it locally
 with `python3 scripts/export_local_schema.py` once that file is available there.
 It writes a new timestamped `odoo-schema-*.json` file without overwriting existing
 files. Inspect any `error_type` entries before treating an export as complete.
-A core schema export from the local lab is now committed. The installed-module and dependent-model inventory is still pending.
+A core schema export is committed. Additional local inventory has been reviewed
+and retained privately; diagnostic tools remain available without publishing it.
 
 ## Current lab and planned architecture
 
@@ -63,16 +64,17 @@ machine, not the user's computer.
 
 The planned engine will use observed version-specific APIs and explicit mappings,
 with a separate PostgreSQL migration journal that survives target restores.
-An Odoo control addon will synchronize journal data for review and authorized
-background retry requests. See [architecture](docs/architecture.md).
+The Odoo control addon now imports journal data for read-only review. Authorized
+background retry requests and UI-triggered execution remain future work. See [architecture](docs/architecture.md).
 
 ## Development status
 
 Product/partner/image/attachment migration, chatter preservation, approved schema mapping,
 general ID tracking, multi-model reconciliation, approval workflows, exports
-and the dashboard remain planned. The pilot implements single synthetic-contact
-ID mapping, history and reconciliation; real Odoo acceptance is still pending.
-No real migration or migration performance results exist.
+and broader execution workflows remain planned. The contact pilot implements
+ID mapping, history and reconciliation. User-local create/rerun/update results
+were supplied successfully; the new monitoring UI awaits local installation.
+No enterprise migration or migration throughput claim is made.
 
 Connection failures are categorized as configuration, network, timeout, HTTP,
 RPC, response or version problems. Raw fault details are deliberately omitted.
@@ -128,10 +130,11 @@ It refuses arbitrary business contacts and remote/production endpoints.
 The journal uses its own Compose project and persistent volume, preserving
 history independently of the target database. Restore conflicts fail closed.
 The full CLI lifecycle passed against real PostgreSQL and synthetic XML-RPC
-servers; it has not yet been validated against the user's real Odoo instances.
+servers; user-local pilot create/rerun/update results have also been supplied.
+The broader workflow remains incomplete.
 
-For journal startup failures, run `python -m migration_lab.pilot journal-check
---lab-only` on one line. It checks connectivity without initialization or Odoo
+For journal startup failures, run
+`python -m migration_lab.pilot journal-check --lab-only`. It checks connectivity without initialization or Odoo
 calls and returns secret-free error categories. See the troubleshooting section
 of docs/contact-pilot.md; retain the original journal password and volume.
 
@@ -139,3 +142,38 @@ The pilot honors usable Odoo-owned defaults for extra required partner fields
 without adding them to the migration payload. Dry-run lists their names only;
 unresolved fields still block with safe diagnostics. Reads/updates do not run
 unrelated create checks. See the required-fields section in docs/contact-pilot.md.
+
+## Tracking UI and synchronization entry points
+
+The `bambus_migration_control` Odoo 20 addon is implemented with an overview,
+record groups, run timelines, issues and last-reconciled mappings. It uses the
+Odoo 20 `ir.access` permission model and separate Viewer/Journal Importer roles.
+Follow [the installation and operation runbook](docs/migration-control-center.md).
+The source-based Compose service now mounts the addon; apply only the documented
+Odoo 20 application recreation and install the addon through Apps.
+
+Actual contact synchronization still starts from the host migration worker:
+
+```sh
+python -m migration_lab.pilot sync --lab-only --label smoke-001
+python -m migration_lab.pilot sync --lab-only --label smoke-001 --apply
+```
+
+Review the dry run before apply. Tracking history is imported independently:
+
+```sh
+python -m migration_lab.pilot init-journal --lab-only
+python -m migration_lab.monitor
+python -m migration_lab.monitor --watch --interval 10
+```
+
+Initialization adds a stable monitoring identity while preserving history. The
+monitor needs the existing journal password and ODOO20 settings plus the target
+Journal Importer role. It reads a consistent, read-only journal snapshot and
+writes only the addon's metadata models. The UI's Reload view does not initiate
+migration or execute shell commands. There are no UI Start/Retry buttons yet.
+
+Validated with real PostgreSQL, the official Odoo 20 image, native addon tests,
+and Chromium. The integration test migrates a synthetic contact into actual
+Odoo 20 from a synthetic Odoo 12 server, then imports its real journal history.
+Local UI installation in your running lab remains the next acceptance step.

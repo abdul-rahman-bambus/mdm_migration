@@ -20,6 +20,8 @@ are out of scope without separate approval. No production access is authorized.
 - `migration_lab/`: standard-library assessment tools plus the scoped contact pilot.
 - `migration_lab/pilot.py`: explicit synthetic-only seed/dry-run/apply/update worker.
 - `migration_lab/journal.py`: PostgreSQL journal; pilot dependency is optional.
+- `migration_lab/monitor.py`: host-side read-only journal export to tracking models.
+- `addons/bambus_migration_control/`: Odoo 20 monitoring UI and validated import API.
 - `mappings/`: versioned, scope-checked synthetic pilot mapping manifest.
 - `lab/journal.compose.yaml`: independent PostgreSQL project/volume for the journal.
 - `migration_lab/schema.py`: offline comparison and unapproved mapping drafts.
@@ -36,7 +38,8 @@ Expected external lab services: odoo12 (Odoo 12 Community, port 8012), pg12
 user: odoo. These are supplied specifications, not verified running versions.
 The lab is local. Compose files and Dockerfiles are now tracked under
 `lab/odoo_migration_lab/`; source clones and existing volumes remain local.
-No Odoo containers have been started in this cloud task. Do not replace that lab.
+Cloud validation uses owned disposable Odoo/PostgreSQL containers only. Do not
+replace the user's existing lab or treat these tests as its installation.
 Odoo Compose/installer require LAB_PG12_PASSWORD and LAB_PG20_PASSWORD with no defaults.
 For existing volumes use their current passwords; changing environment variables
 does not rotate database credentials. Inventory requires no container restart.
@@ -91,15 +94,16 @@ Implemented: assessment CLI, bounded read-only XML-RPC probes, offline schema
 comparison, complete unapproved mapping draft and module/dependency inventory
 tooling. The synthetic-contact pilot now implements explicit writes, persistent
 ID mapping, journal events and read-back reconciliation. General business-data
-migration, broader approved mappings, dashboard and target-restore recovery
-remain unimplemented.
+migration, broader approved mappings, UI-triggered job execution and target-restore
+recovery remain unimplemented. The read-only Odoo tracking dashboard is now built.
 User-local screenshot evidence confirms XML-RPC authentication, server-reported
 versions 12.0/20.0, and metadata/sample reads on three models. See
 docs/local-connectivity-evidence.md; this is not a cloud integration test.
 Cloud-to-local access and credential bindings remain unavailable here.
 The core schema export is committed and compared under docs/schema-reports/.
-Next: run `python3 -m migration_lab.inventory --output-dir reports/local-inventory-2`
-locally with the existing exported variables. The updated collector refreshes core schemas and checks registry visibility
+Next: install the tracking addon locally and import existing journal history per
+docs/migration-control-center.md. Inventory tools remain available for schema
+diagnostics; the collector refreshes core schemas and checks registry visibility
 after metadata failures. A hidden/missing registry row is not proof of global
 model absence. Preserve explicit partial results and review mappings.
 
@@ -129,11 +133,12 @@ one authoritative journal for locking/idempotence. Mark success only after
 read-back reconciliation. Block source/target identity conflicts and target
 restore/missing-mapping situations for review; do not auto-delete/recreate them.
 
-Standard tests: python -m unittest discover -s tests -v (72 tests at this update).
-Optional integration: python scripts/run_pilot_integration.py (15 tests), after
+Standard tests: python -m unittest discover -s tests -v (78 tests at this update).
+Optional integration: python scripts/run_pilot_integration.py (16 tests), after
 installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
 container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
-removes that exact test container. Real Odoo pilot acceptance is still pending.
+removes that exact test container. User-local pilot create/rerun/update evidence
+has been supplied; local tracking UI installation remains pending.
 
 Journal readiness must use TCP (-h 127.0.0.1), not just the initialization
 Unix socket. journal-check is read-only and does not require Odoo variables.
@@ -148,3 +153,32 @@ valid defaults for their respective types; unknown/missing defaults stay blocked
 with field names only. Perform this check before create intent. Read/update paths
 must not require unrelated create defaults. Actual read-back reconciliation is
 still mandatory; metadata/default availability alone never proves success.
+
+## Tracking UI rules
+
+The Odoo 20 addon is a journal mirror, never the authority. Odoo 20 uses ir.access
+with operation r for viewer permissions; do not substitute legacy ACL CSV files.
+Viewer can read tracking; only the trusted Journal Importer role can call the
+validated importer. Even importer users cannot directly create/write/delete
+mirror records or forge the internal import capability through RPC context.
+No raw business values/credentials are accepted in monitoring event details.
+
+The host monitor reads a repeatable-read READ ONLY PostgreSQL transaction. It
+stages bounded pages, preserves old complete views during partial imports,
+checks counts/mapping/reconciliation evidence and atomically promotes completion.
+All UI counts derive from journal data. Track records by namespace independently
+of run attempts; newest failed/incomplete outcomes must not be hidden by an older
+successful mapping. Incomplete is not evidence a worker is currently running.
+Source/mapping checks prevent opening a missing/reused target ID. Respect normal
+contact permissions; no sudo is used for target navigation.
+
+Contact sync starts from pilot CLI; tracking import starts from monitor CLI.
+Reload view only reloads imported metadata. UI-triggered migration/approval/retry
+requires a separate authorized background-worker request design; never invoke
+arbitrary commands from web requests. Do not put journal passwords in Odoo.
+
+Native addon/browser validation: python scripts/run_control_integration.py,
+after requirements-control-test.txt, Docker and Chromium. It owns disposable
+Odoo/PostgreSQL containers/network/tmpfs only and never touches existing lab
+services/volumes. Current results: 22 native Odoo tests plus browser smoke passed.
+Keep redacted test logs/screenshots under ignored reports/, not in Git.

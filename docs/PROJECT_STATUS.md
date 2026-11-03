@@ -1,97 +1,75 @@
 # Project status
 
 Latest update: 2026-11-03 (Asia/Kolkata). Branch: development.
-Base before this pilot increment: c02bac2. Use git log -1 --format=%H for HEAD.
-Main is unchanged. Private inventory/review branches must not be pushed.
+Base for UI increment: 94d339e. Use git log -1 --format=%H for the latest commit.
+Main and private local review branches are unchanged; never push those archives.
 
-## Implemented and verified
+## Implemented
 
-- Existing read-only connectivity, module/schema inventory and offline schema
-  comparison remain available. Detailed user-uploaded inventory remains private.
-- Synthetic-only contact pilot: seed on Odoo 12, dry-run, explicitly applied
-  target create/update, name/email/phone read-back reconciliation, status.
-- Explicit versioned mapping manifest, endpoint/database guards, synthetic record
-  guards, marker-based duplicate prevention and safe create acknowledgement retry.
-- Independent PostgreSQL 16 journal: persistent run/event/mapping history,
-  environment/model/record identities, payload fingerprints, mapping version,
-  transactionally committed reconciliation and PostgreSQL worker locking.
-- Target restore/ID conflicts fail closed; automatic restore recovery is not built.
-- 72 standard tests passed (4.695s), 0 failures/errors/skips.
-- 15 integration tests passed (13.558s), 0 failures/errors/skips, using real
-  PostgreSQL and synthetic version-12/version-20 XML-RPC HTTP servers.
-- CLI seed/dry-run/apply/rerun/update/status lifecycle passed against those fixtures.
-- Actual PostgreSQL tests exercised locking, lost source/target acknowledgements,
-  interruption/new-worker continuation, failed reconciliation, independent mapping
-  retention after simulated target loss, and repeatable non-destructive init.
-- Pinned pilot dependencies installed successfully; pip check passed.
-- Independent journal Compose configuration validation passed with a non-secret
-  validation placeholder. No user journal or Odoo volume/container was changed.
+- Synthetic contact pilot with explicit create/update, native-default validation,
+  marker-based idempotence, journal intents/history, locking and reconciliation.
+  User-local create/rerun/update results have been supplied successfully; actual
+  run IDs, private inventory and screenshots are not published in this increment.
+- Read-only Odoo 20 Bambus Migration Control addon: overview, grouped records,
+  execution histories/timelines, issues, reconciliation evidence and mappings.
+- Viewer and trusted Journal Importer roles; Odoo 20 ir.access permissions and
+  protected mirror writes. No arbitrary shell execution or business sync in UI.
+- Host-side monitor with consistent READ ONLY journal snapshot, bounded pages,
+  change detection, stable journal identity, resumable staging and atomic
+  activation. Immutable completed snapshots and stale-import protection.
+- Current outcomes separated from historical successes/failures; reruns grouped
+  as one tracked namespace. Incomplete attempts are not labelled live processes.
+- Target-contact navigation validates its marker and honors native permissions.
+- Additive journal monitoring identity and Odoo 20 addon mount/path configuration.
+  No Odoo 12, PostgreSQL service, password, existing volume or database was reset.
 
-## Not verified on real Odoo
+## Executed validation
 
-No cloud-to-local access exists. The user previously supplied successful live
-read-only results, but no actual Odoo write/reconciliation pilot has yet run.
-Synthetic HTTP fixture compatibility does not establish real Odoo behavior.
-Mail suppression flags were verified in fixture requests, not custom Odoo hooks.
-Journal Compose syntax is verified; actual PostgreSQL integration used a separate
-owned test container, not the user's persistent journal service.
+- 78 standard unit/protocol tests passed, 0 failures/errors/skips (4.244s).
+- 16 PostgreSQL/HTTP pilot integration tests passed (14.278s), including READ ONLY
+  monitor export and preservation of stable identity on repeat initialization.
+- 22 native Odoo addon tests passed on official Odoo 20 (20.0-20261102), 0 failed
+  or errors. Roles, context forgery/direct writes, idempotence, stale/partial/empty
+  snapshots, evidence validation and marker-checked navigation were exercised.
+- Real Chromium overview/lists/read-only controls, record timeline/drill-down,
+  target navigation and stylesheet/layout assertions passed without page errors.
+- End-to-end contact pipeline into actual Odoo 20 from a synthetic Odoo 12 server:
+  seed, preview, lost acknowledgement, safe retry, rerun, source edit and update.
+  Its real journal produced one tracked record across seven execution attempts.
+  Monitor import did not change the target contact count. These are isolated
+  synthetic integration results, not fabricated user dashboard totals.
+- Both Compose configurations validated with non-secret placeholders; pip check
+  passed. Test containers/network/tmpfs were cleaned by their owner; no existing
+  lab resource or named test volume was used.
 
-## Scope limits / not started
+Verified source reference for API inspection: official Odoo 20 branch commit
+006f5cc915ebb0f30c6f8602c1b42e6d7ff1e754 (ignored dependency clone).
+Odoo test image digest: a97a7665e2b9fd890e12785491a2c91d779f800bcbc30873dada1c8748b28f1c.
+Runtime screenshots/logs/results are in ignored reports/control-integration/.
+Detailed uploaded environment metadata remains private, outside the checkout.
 
-Arbitrary contacts, partner roles/classification/address relationships, products,
-UoM transformations, variants, binary data, chatter, generic mapping execution,
-full approval/fix/retry workflow, dashboard, bulk batches, performance measurement,
-cutover and automatic restore recovery remain outside the implemented pilot.
-The journal is a single-record foundation, not the completed tracking system.
+## Local acceptance still needed
 
-## Current environment and evidence
+The addon is not installed on the user's running lab by these cloud tests.
+Follow docs/migration-control-center.md: pull development, preserve/export the
+existing PostgreSQL lab passwords, recreate only the Odoo 20 application to mount
+addons, install through Apps, assign the worker account Journal Importer, repeat
+non-destructive journal init, then run monitor. Verify actual history/counts and
+Viewer permissions locally. No image rebuild or database reset is required.
 
-Python 3.12.14; psycopg/psycopg-binary 3.2.3 and typing-extensions 4.16.0 in ignored
-.venv. PostgreSQL 16 image pinned by tested digest. Integration test containers
-were removed by their owner; no named test volume was created. Test data was
-synthetic. No private uploaded metadata is included in this increment.
+Contact migration continues to start from pilot CLI with explicit --apply.
+Tracking import starts from monitor CLI; --watch only repeats tracking imports.
+Reload view does not initiate either worker or perform new reconciliation.
 
-Latest successful real Odoo migration: none. Latest real Odoo reconciliation:
-none. Tested fixture runs reconciled successfully; they are not production or
-client readiness evidence. No measured migration throughput exists.
+## Limits / future work
 
-## Next local acceptance task
-
-Follow docs/contact-pilot.md: pull development, install optional requirements,
-export a journal-only password, start the independent journal and initialize it.
-Keep existing Odoo services running with the same eight ODOO variables exported.
-Seed label smoke-001, review dry-run, explicitly apply, repeat to verify same target
-ID, then change the source's reserved synthetic phone and apply the update.
-Share safe command output/status. Stop on blocked prerequisites; do not reset
-volumes, delete mappings or bypass reconciliation to make a check pass.
-
-## Journal startup diagnostic correction
-
-Earlier local acceptance was blocked at journal connection, before any Odoo
-pilot write. Journal initialization has since succeeded locally. The specific cause is still unconfirmed; the earlier generic code
-hid it. Replaced Unix-socket readiness with TCP readiness and added journal-check
-with allowlisted categories/diagnostics. Startup-only connection retries are
-bounded at three and exclude authentication/configuration failures. Failed
-connections close cleanly. No existing journal password/volume was changed.
-
-Latest validation: 72 standard tests passed (4.695s) and 15 integration tests
-passed (13.558s). Actual wrong-password classification and a history-preserving,
-Odoo-independent journal-check were exercised against owned PostgreSQL. A
-socket-only PostgreSQL probe separately reproduced the old readiness false
-positive. New diagnostics still need execution on the user's computer.
-
-## Required native-default correction
-
-Local pilot seed/sync was blocked by the extra-required-field guard before
-creating a contact. The guard incorrectly rejected native defaults during
-connection setup. Create validation now queries default_get only when needed,
-checks supported default types (including false/zero), leaves defaults to the
-same server's ORM, and reports unresolved field names without values. It does
-not copy extra fields or expand the mapping. Dry-run reports default field names.
-
-Validated 72 unit/protocol tests (4.695s) and 15 real-PostgreSQL/synthetic-Odoo
-integration tests (13.558s). New integration cases cover distinct source/target
-defaults, unchanged payload scope, missing-default rejection before create intent,
-correction without clearing history, and existing reads/updates without create
-preconditions. Actual local Odoo create/reconciliation still awaits rerun.
-No schema change, volume reset, password change or new package is required.
+This is contact-pilot monitoring, not the complete enterprise migration engine.
+UI-triggered job requests/approvals/retries, multi-model business migration,
+products/UoM/variants/binaries/chatter, full fix workflow, record-company/OPCO
+segregation, snapshot retention/compaction and scale benchmarks remain unbuilt.
+Viewer sees imported journals in this database; importer is a trusted data role.
+Snapshots cap each journal table at 10,000 rows and pages at 100. No actual
+enterprise performance/cutover claim is made. Journal signatures cover supported
+append/update paths, not arbitrary SQL tampering. Historical reconciliation is
+not a new live target check. Actual local restoration procedures remain untested;
+missing/conflicting business IDs still fail closed in the worker/navigation.

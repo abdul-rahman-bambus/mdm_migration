@@ -51,3 +51,14 @@ marker handle interrupted create retries; reconciliation is committed atomically
 with the last-successful mapping in PostgreSQL. There is no cross-system
 transaction. Restore conflicts fail closed. See migration-tracking.md and
 contact-pilot.md; the wider planned architecture above is still incomplete.
+
+## Read-only tracking UI increment
+
+The implemented Odoo 20 addon mirrors journal metadata through an authenticated,
+role-restricted import API; it has no PostgreSQL secret and never executes the
+migration worker. The host monitor reads an independent repeatable-read READ
+ONLY snapshot, validates the shared schema contract and sends bounded pages.
+The UI activates only complete, checked snapshots and groups run attempts into
+tracked namespaces. History stays authoritative outside Odoo; current journal
+outcomes and historical successful mappings remain distinct. See
+migration-control-center.md for setup, consistency, role and scale limits.

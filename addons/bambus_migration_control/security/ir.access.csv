@@ -1,0 +1,8 @@
+id,name,model_id,group_id/id,operation,domain
+access_migration_source,Migration source,bambus.migration.source,group_migration_viewer,r,
+access_migration_snapshot,Migration snapshot,bambus.migration.snapshot,group_migration_viewer,r,
+access_migration_run,Migration run,bambus.migration.run,group_migration_viewer,r,
+access_migration_event,Migration event,bambus.migration.event,group_migration_viewer,r,
+access_migration_mapping,Migration mapping,bambus.migration.mapping,group_migration_viewer,r,
+access_migration_record,Migration record,bambus.migration.record,group_migration_viewer,r,
+access_migration_issue,Migration issue,bambus.migration.issue,group_migration_viewer,r,

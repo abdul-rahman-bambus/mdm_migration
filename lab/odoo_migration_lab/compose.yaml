@@ -56,7 +56,8 @@ services:
     volumes:
       - odoo20_data:/var/lib/odoo
       - ./source/odoo20:/opt/odoo:ro
-    command: ["/opt/venv/bin/python", "/opt/odoo/odoo-bin", "--db_host=pg20", "--db_user=odoo", "--db_password=${LAB_PG20_PASSWORD:?Set LAB_PG20_PASSWORD to the existing lab database password}", "--db-filter=^odoo20_migration$", "--database=odoo20_migration", "--http-interface=0.0.0.0", "--http-port=8069", "--data-dir=/var/lib/odoo"]
+      - ../../addons:/mnt/bambus-addons:ro
+    command: ["/opt/venv/bin/python", "/opt/odoo/odoo-bin", "--db_host=pg20", "--db_user=odoo", "--db_password=${LAB_PG20_PASSWORD:?Set LAB_PG20_PASSWORD to the existing lab database password}", "--db-filter=^odoo20_migration$", "--database=odoo20_migration", "--http-interface=0.0.0.0", "--http-port=8069", "--data-dir=/var/lib/odoo", "--addons-path=/opt/odoo/odoo/addons,/opt/odoo/addons,/mnt/bambus-addons"]
 volumes:
   pg12_data:
   pg20_data:

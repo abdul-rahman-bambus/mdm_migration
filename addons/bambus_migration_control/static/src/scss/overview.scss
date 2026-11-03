@@ -1,0 +1,17 @@
+.o_bambus_overview .o_kanban_record:not(.o_kanban_ghost) {
+    flex: 1 1 900px;
+    max-width: 1100px;
+    border-top: 4px solid #236c60;
+}
+.bm_metric {
+    background: #f4f7f8;
+    border-radius: 8px;
+    padding: 16px;
+    height: 100%;
+}
+.bm_value {
+    color: #236c60;
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+}

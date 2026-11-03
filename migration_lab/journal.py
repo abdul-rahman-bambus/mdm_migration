@@ -48,6 +48,11 @@ DDL = """
 CREATE SCHEMA IF NOT EXISTS bambus_pilot;
 CREATE TABLE IF NOT EXISTS bambus_pilot.version (version integer PRIMARY KEY CHECK (version = 1));
 INSERT INTO bambus_pilot.version VALUES (1) ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS bambus_pilot.monitor_identity (
+    singleton boolean PRIMARY KEY DEFAULT true CHECK (singleton),
+    journal_key uuid NOT NULL UNIQUE DEFAULT gen_random_uuid()
+);
+INSERT INTO bambus_pilot.monitor_identity (singleton) VALUES (true) ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS bambus_pilot.runs (
     id uuid PRIMARY KEY, namespace text NOT NULL, operation text NOT NULL,
     source_identity text NOT NULL, target_identity text NOT NULL,

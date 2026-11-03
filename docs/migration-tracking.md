@@ -30,3 +30,12 @@ Target restore/mapping conflicts fail closed rather than overwriting a reused
 ID or silently recreating a mapped record. Full restore reconciliation, approval
 records, field-level correction workflow, multi-record batches and dashboard
 synchronization remain future extensions. See contact-pilot.md for actual commands.
+
+## UI mirror
+
+Journal initialization now adds monitor_identity with a stable UUID; repeated
+initialization leaves history and identity intact. The Odoo 20 addon imports
+complete snapshots through a trusted importer role. It has no access to journal
+credentials or arbitrary command execution. Monitoring is read-only against the
+journal and writes only Odoo metadata mirrors. See migration-control-center.md
+for staged activation, signature/scale limits, worker entry points and roles.

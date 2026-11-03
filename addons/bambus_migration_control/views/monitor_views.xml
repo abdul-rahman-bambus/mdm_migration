@@ -1,0 +1,76 @@
+<odoo>
+    <record id="source_kanban" model="ir.ui.view">
+        <field name="name">Migration overview</field><field name="model">bambus.migration.source</field>
+        <field name="arch" type="xml">
+            <kanban create="false" edit="false" delete="false" class="o_bambus_overview">
+                <field name="name"/><field name="imported_at"/><field name="captured_at"/><field name="last_checked_at"/><field name="monitor_state"/>
+                <field name="record_count"/><field name="reconciled_count"/><field name="attention_count"/><field name="pending_count"/>
+                <field name="run_count"/><field name="failure_count"/><field name="mapping_count"/>
+                <templates><t t-name="card"><div class="p-3">
+                    <div class="d-flex justify-content-between align-items-center"><h3><field name="name"/></h3><span class="badge text-bg-light">Monitoring only · <field name="monitor_state"/></span></div>
+                    <p class="text-muted">Contacts migrate through the external migration worker. Reloading this view never initiates a sync. Journal results are historical evidence, not a new check of current contacts.</p>
+                    <div t-if="!record.imported_at.raw_value" class="alert alert-info">Waiting for a complete journal import. No migration totals are available yet.</div>
+                    <div class="row g-3 my-2">
+                        <div class="col-6 col-lg-3"><div class="bm_metric"><span class="bm_value"><field name="record_count"/></span>Tracked records</div></div>
+                        <div class="col-6 col-lg-3"><div class="bm_metric"><span class="bm_value"><field name="reconciled_count"/></span>Latest reconciled</div></div>
+                        <div class="col-6 col-lg-3"><div class="bm_metric"><span class="bm_value"><field name="attention_count"/></span>Need attention</div></div>
+                        <div class="col-6 col-lg-3"><div class="bm_metric"><span class="bm_value"><field name="pending_count"/></span>Awaiting sync / preview</div></div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 my-3 text-muted"><span>Attempts: <field name="run_count"/></span><span>Historical failures: <field name="failure_count"/></span><span>Last successful mappings: <field name="mapping_count"/></span></div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="object" name="action_records" class="btn btn-primary">Records</button>
+                        <button type="object" name="action_runs" class="btn btn-secondary">Run history</button>
+                        <button type="object" name="action_issues" class="btn btn-secondary">Issues</button>
+                        <button type="object" name="action_mappings" class="btn btn-secondary">Mappings</button>
+                        <button type="object" name="action_reload" class="btn btn-outline-secondary">Reload view</button>
+                    </div>
+                    <div class="mt-3 small text-muted">Monitor checked: <field name="last_checked_at"/> · Journal captured: <field name="captured_at"/> · Imported: <field name="imported_at"/></div>
+                </div></t></templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="source_form" model="ir.ui.view">
+        <field name="name">Migration overview details</field><field name="model">bambus.migration.source</field>
+        <field name="arch" type="xml"><form create="false" edit="false" delete="false">
+            <header><button name="action_reload" type="object" string="Reload view"/></header>
+            <sheet><h1><field name="name"/></h1><div class="alert alert-info">Monitoring only. Contact sync starts from the external migration worker. Importing or reloading history does not change contacts.</div>
+                <group><group><field name="record_count"/><field name="reconciled_count"/><field name="attention_count"/><field name="pending_count"/></group>
+                    <group><field name="run_count"/><field name="failure_count"/><field name="mapping_count"/><field name="event_count"/><field name="monitor_state"/><field name="last_checked_at"/><field name="captured_at"/><field name="imported_at"/></group></group>
+                <notebook><page string="Import history"><field name="snapshot_ids" readonly="1"><list create="false" edit="false" delete="false"><field name="captured_at"/><field name="completed_at"/><field name="state"/><field name="is_current"/><field name="expected_runs"/><field name="expected_events"/></list></field></page>
+                    <page string="Journal identity"><field name="journal_key"/></page></notebook>
+            </sheet></form></field>
+    </record>
+    <record id="record_list" model="ir.ui.view"><field name="name">Tracked records</field><field name="model">bambus.migration.record</field><field name="arch" type="xml"><list create="false" edit="false" delete="false"><field name="name"/><field name="latest_state" widget="badge" decoration-success="latest_state == 'reconciled'" decoration-danger="latest_state == 'failed'"/><field name="source_record_id"/><field name="target_record_id"/><field name="latest_run_id"/></list></field></record>
+    <record id="record_search" model="ir.ui.view"><field name="name">Tracked record search</field><field name="model">bambus.migration.record</field><field name="arch" type="xml"><search><field name="name"/><field name="namespace"/><filter name="reconciled" string="Reconciled" domain="[('latest_state','=','reconciled')]"/><filter name="attention" string="Need attention" domain="[('latest_state','in',['failed','running'])]"/><filter name="pending" string="Awaiting sync / preview" domain="[('latest_state','in',['seeded','source_updated','dry_run'])]"/></search></field></record>
+    <record id="record_form" model="ir.ui.view"><field name="name">Tracked record details</field><field name="model">bambus.migration.record</field><field name="arch" type="xml"><form create="false" edit="false" delete="false"><header><button type="object" name="action_open_target" string="Open target contact" invisible="not target_record_id"/></header><sheet>
+        <h1><field name="name"/></h1><group><field name="latest_state" widget="badge"/><field name="source_record_id"/><field name="target_record_id"/><field name="latest_run_id"/><field name="mapping_id"/></group>
+        <div class="text-muted">Latest attempt and last reconciled mapping are separate evidence. A historical successful mapping does not imply the latest attempt succeeded.</div>
+        <notebook><page string="Execution history"><field name="run_ids" readonly="1"><list create="false" edit="false" delete="false"><field name="started_at"/><field name="operation"/><field name="state"/><field name="error_code"/></list></field></page><page string="Tracking identity"><field name="namespace"/><field name="snapshot_id"/></page></notebook>
+    </sheet></form></field></record>
+    <record id="run_list" model="ir.ui.view"><field name="name">Execution attempts</field><field name="model">bambus.migration.run</field><field name="arch" type="xml"><list create="false" edit="false" delete="false"><field name="started_at"/><field name="operation"/><field name="state" widget="badge" decoration-success="state == 'reconciled'" decoration-danger="state == 'failed'"/><field name="source_record_id"/><field name="target_record_id"/><field name="duration"/><field name="error_code"/></list></field></record>
+    <record id="run_search" model="ir.ui.view"><field name="name">Attempt search</field><field name="model">bambus.migration.run</field><field name="arch" type="xml"><search><field name="journal_run_id"/><field name="namespace"/><field name="error_code"/><filter name="reconciled" string="Reconciled" domain="[('state','=','reconciled')]"/><filter name="failed" string="Failed" domain="[('state','=','failed')]"/><filter name="incomplete" string="Incomplete" domain="[('state','=','running')]"/><filter name="preview" string="Preview" domain="[('state','=','dry_run')]"/><separator/><filter name="started" string="Date" date="started_at"/><group><filter name="by_state" string="Result" context="{'group_by':'state'}"/><filter name="by_operation" string="Operation" context="{'group_by':'operation'}"/></group></search></field></record>
+    <record id="run_form" model="ir.ui.view"><field name="name">Execution details</field><field name="model">bambus.migration.run</field><field name="arch" type="xml"><form create="false" edit="false" delete="false"><sheet><h1><field name="journal_run_id"/></h1>
+        <group><group><field name="operation"/><field name="state" widget="badge"/><field name="record_id"/><field name="source_record_id"/><field name="target_record_id"/></group><group><field name="started_at"/><field name="finished_at"/><field name="duration"/><field name="mapping_version"/><field name="error_code"/></group></group>
+        <div invisible="state != 'running'" class="alert alert-warning">This attempt has no final journal result. It is incomplete; this does not prove a worker is currently running.</div>
+        <notebook><page string="Event timeline"><field name="event_ids" readonly="1"><list create="false" edit="false" delete="false"><field name="journal_event_id"/><field name="occurred_at"/><field name="state"/><field name="details"/></list></field></page>
+            <page string="Reconciliation evidence"><div class="text-muted">The worker records reconciliation after target read-back. Raw business values are not stored here.</div><group><field name="state"/><field name="payload_digest"/><field name="mapping_version"/></group></page>
+            <page string="Environment identities"><group><field name="source_identity"/><field name="target_identity"/><field name="namespace"/><field name="snapshot_id"/></group></page></notebook>
+    </sheet></form></field></record>
+    <record id="event_list" model="ir.ui.view"><field name="name">Journal timeline</field><field name="model">bambus.migration.event</field><field name="arch" type="xml"><list create="false" edit="false" delete="false"><field name="journal_event_id"/><field name="occurred_at"/><field name="state"/><field name="run_id"/><field name="details"/></list></field></record>
+    <record id="mapping_list" model="ir.ui.view"><field name="name">Last reconciled mappings</field><field name="model">bambus.migration.mapping</field><field name="arch" type="xml"><list create="false" edit="false" delete="false"><field name="source_model"/><field name="source_record_id"/><field name="target_model"/><field name="target_record_id"/><field name="mapping_version"/><field name="updated_at"/><field name="last_run_id"/></list></field></record>
+    <record id="mapping_form" model="ir.ui.view"><field name="name">Mapping evidence</field><field name="model">bambus.migration.mapping</field><field name="arch" type="xml"><form create="false" edit="false" delete="false"><sheet><group><field name="source_model"/><field name="source_record_id"/><field name="target_model"/><field name="target_record_id"/><field name="state"/><field name="mapping_version"/><field name="last_run_id"/><field name="updated_at"/></group><notebook><page string="Integrity"><field name="payload_digest"/><field name="marker"/><field name="namespace"/><field name="snapshot_id"/></page></notebook></sheet></form></field></record>
+    <record id="issue_list" model="ir.ui.view"><field name="name">Issues and incomplete attempts</field><field name="model">bambus.migration.issue</field><field name="arch" type="xml"><list create="false" edit="false" delete="false"><field name="severity" widget="badge"/><field name="error_code"/><field name="run_id"/></list></field></record>
+    <record id="issue_search" model="ir.ui.view"><field name="name">Issue search</field><field name="model">bambus.migration.issue</field><field name="arch" type="xml"><search><field name="error_code"/><filter name="errors" string="Errors" domain="[('severity','=','error')]"/><filter name="incomplete" string="Incomplete attempts" domain="[('severity','=','warning')]"/></search></field></record>
+    <record id="issue_form" model="ir.ui.view"><field name="name">Issue evidence</field><field name="model">bambus.migration.issue</field><field name="arch" type="xml"><form create="false" edit="false" delete="false"><sheet><group><field name="error_code"/><field name="severity"/><field name="run_id"/><field name="snapshot_id"/></group><div class="alert alert-info">This is journal evidence, not a completed root-cause diagnosis or approved fix. Review the timeline; retries start from the external migration worker.</div></sheet></form></field></record>
+    <record id="action_source" model="ir.actions.act_window"><field name="name">Migration overview</field><field name="res_model">bambus.migration.source</field><field name="view_mode">kanban,form</field><field name="help" type="html"><p>Import history with the external monitor worker to populate this overview. This app does not initiate contact synchronization.</p></field></record>
+    <record id="action_record" model="ir.actions.act_window"><field name="name">Tracked records</field><field name="res_model">bambus.migration.record</field><field name="view_mode">list,form</field><field name="domain">[('current','=',True)]</field></record>
+    <record id="action_run" model="ir.actions.act_window"><field name="name">Execution attempts</field><field name="res_model">bambus.migration.run</field><field name="view_mode">list,form</field><field name="domain">[('current','=',True)]</field></record>
+    <record id="action_mapping" model="ir.actions.act_window"><field name="name">Last reconciled mappings</field><field name="res_model">bambus.migration.mapping</field><field name="view_mode">list,form</field><field name="domain">[('current','=',True)]</field></record>
+    <record id="action_issue" model="ir.actions.act_window"><field name="name">Issues and incomplete attempts</field><field name="res_model">bambus.migration.issue</field><field name="view_mode">list,form</field><field name="domain">[('current','=',True)]</field></record>
+    <menuitem id="menu_root" name="Bambus Migration Control" sequence="30" web_icon="bambus_migration_control,static/description/icon.svg" groups="group_migration_viewer"/>
+    <menuitem id="menu_overview" name="Overview" parent="menu_root" action="action_source" sequence="10"/>
+    <menuitem id="menu_records" name="Records" parent="menu_root" action="action_record" sequence="20"/>
+    <menuitem id="menu_runs" name="Runs" parent="menu_root" action="action_run" sequence="30"/>
+    <menuitem id="menu_issues" name="Issues" parent="menu_root" action="action_issue" sequence="40"/>
+    <menuitem id="menu_mappings" name="Mappings" parent="menu_root" action="action_mapping" sequence="50"/>
+</odoo>

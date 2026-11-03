@@ -14,6 +14,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from migration_lab.journal import Journal, PilotError
 from migration_lab.pilot import PartnerAPI, main, migrate, specification
 from migration_lab.preflight import ProbeFailure, Settings
+from migration_lab.monitor import transfer
 
 
 class RPCPartnerFixture:
@@ -287,3 +288,37 @@ class PostgresPilotTests(unittest.TestCase):
         self.assertEqual(self.action(apply=True)["operation"], "update")
         calls = [args[4] for operation, args in self.source.calls + self.target.calls if operation == "execute_kw"]
         self.assertNotIn("default_get", calls)
+
+    def test_monitor_streams_metadata_without_source_writes_and_skips_unchanged(self):
+        import psycopg
+
+        class Sink:
+            def __init__(self, test):
+                self.test, self.state, self.rows = test, "importing", {"runs": {}, "events": {}, "mappings": {}}
+
+            def call(self, method, *args):
+                if method == "begin_import":
+                    self.manifest = args[0]
+                    with self.test.assertRaises(psycopg.errors.ReadOnlySqlTransaction):
+                        with self.test.journal.connection.transaction():
+                            self.test.journal.connection.execute("UPDATE bambus_pilot.version SET version=version")
+                    return {"state": "unchanged" if self.state == "complete" else "importing"}
+                if method == "import_page":
+                    _, kind, rows = args
+                    for row in rows:
+                        self.rows[kind][row["namespace"] if kind == "mappings" else row["id"]] = row
+                    return {"rows": len(rows)}
+                self.test.assertEqual({kind: len(rows) for kind, rows in self.rows.items()}, self.manifest["counts"])
+                self.state = "complete"
+                return {"state": "complete"}
+
+        self.action(apply=True)
+        sink = Sink(self)
+        result = transfer(self.journal, sink)
+        self.assertEqual(result["state"], "imported")
+        self.assertGreater(result["counts"]["runs"], 0)
+        self.assertEqual(transfer(self.journal, sink)["state"], "unchanged")
+        before = self.journal.connection.execute("SELECT journal_key FROM bambus_pilot.monitor_identity").fetchone()
+        self.journal.initialize()
+        after = self.journal.connection.execute("SELECT journal_key FROM bambus_pilot.monitor_identity").fetchone()
+        self.assertEqual(before, after)

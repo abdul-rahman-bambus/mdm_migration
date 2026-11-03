@@ -51,6 +51,27 @@ class SchemaComparisonTests(unittest.TestCase):
         self.assertEqual(row["api_writeability"], "not_verified")
         self.assertNotIn("same_name_scalar_candidate", row["flags"])
 
+    def test_polymorphic_business_record_ids_require_mapping(self):
+        row = compare(snapshot({"res_id": field("integer")},
+                               {"res_id": field("many2one_reference", model_field="res_model")}))["models"]["demo.model"]["fields"][0]
+        self.assertIn("relational_mapping_required", row["flags"])
+        self.assertIn("polymorphic_reference_review", row["flags"])
+        self.assertIn("type_changed", row["flags"])
+        self.assertNotIn("same_name_scalar_candidate", row["flags"])
+
+    def test_odoo_integer_boolean_metadata_is_normalized_without_mutation(self):
+        source = field(required=1, readonly=0)
+        target = field(required=True, readonly=False)
+        row = compare(snapshot({"name": source}, {"name": target}))["models"]["demo.model"]["fields"][0]
+        self.assertIs(row["source"]["required"], True)
+        self.assertNotIn("required_changed", row["flags"])
+        self.assertIn("source_boolean_metadata_normalized", row["flags"])
+        self.assertEqual(type(source["required"]), int)
+
+    def test_nonboolean_integer_metadata_is_rejected(self):
+        with self.assertRaises(ValueError):
+            compare(snapshot({"name": field(required=2)}, {"name": field()}))
+
     def test_dangerous_direct_copies_are_flagged(self):
         values = {"id": field("integer"), "relation": field("many2one", relation="res.partner"),
                   "image": field("binary"), "computed": field(compute="_compute_x"),

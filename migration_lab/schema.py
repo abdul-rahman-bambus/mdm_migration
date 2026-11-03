@@ -7,8 +7,9 @@ import json
 from collections import Counter
 from pathlib import Path
 
-RELATIONS = {"many2one", "one2many", "many2many"}
+RELATIONS = {"many2one", "one2many", "many2many", "reference", "many2one_reference"}
 SYSTEM_FIELDS = {"id", "display_name", "__last_update", "create_uid", "create_date", "write_uid", "write_date"}
+BOOLEAN_ATTRIBUTES = ("readonly", "required", "store", "company_dependent")
 
 
 def validate_snapshot(data):
@@ -24,8 +25,9 @@ def validate_snapshot(data):
             for name, meta in fields.items():
                 if not isinstance(meta, dict) or not isinstance(meta.get("type"), str):
                     raise ValueError(f"Incomplete field metadata: {side}.{model}.{name}")
-                for key in ("readonly", "required", "store", "company_dependent"):
-                    if key in meta and type(meta[key]) is not bool:
+                for key in BOOLEAN_ATTRIBUTES:
+                    if key in meta and not (type(meta[key]) is bool or
+                                            (type(meta[key]) is int and meta[key] in (0, 1))):
                         raise ValueError(f"Invalid {key} metadata: {side}.{model}.{name}")
                 if "selection" in meta and meta["selection"] is not None:
                     items = meta["selection"]
@@ -58,15 +60,24 @@ def compare(data):
         target = data["ODOO20"].get(model, {})
         rows = []
         for name in sorted(source.keys() | target.keys()):
-            old, new = source.get(name), target.get(name)
+            def normalized(meta):
+                if meta is None:
+                    return None
+                return {key: bool(value) if key in BOOLEAN_ATTRIBUTES else value
+                        for key, value in meta.items()}
+
+            old, new = normalized(source.get(name)), normalized(target.get(name))
             flags = []
             details = {}
+            for side, raw in (("source", source.get(name)), ("target", target.get(name))):
+                if raw is not None and any(type(raw.get(key)) is int for key in BOOLEAN_ATTRIBUTES):
+                    flags.append(f"{side}_boolean_metadata_normalized")
             if old is None:
                 flags.append("target_only")
             elif new is None:
                 flags.append("source_only")
             else:
-                for key in ("type", "relation", "required", "readonly", "store", "company_dependent", "related"):
+                for key in ("type", "relation", "required", "readonly", "store", "company_dependent", "related", "model_field"):
                     if old.get(key) != new.get(key):
                         flags.append(f"{key}_changed")
                         details[key] = {"source": old.get(key), "target": new.get(key)}
@@ -83,6 +94,8 @@ def compare(data):
                     flags.append("new_required_field")
                 if new.get("type") in RELATIONS:
                     flags.append("relational_mapping_required")
+                if new.get("type") in {"reference", "many2one_reference"}:
+                    flags.append("polymorphic_reference_review")
                 if new.get("related"):
                     flags.append("related_field_review")
                 if new.get("store") is False:

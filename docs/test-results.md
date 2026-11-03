@@ -6,7 +6,7 @@ Command from `/workspace/mdm_migration`:
 python3 -m unittest discover -s tests -v
 ```
 
-Latest run: **34 tests, 34 passed, 0 failures/errors, 0 skipped**, 5.155 seconds.
+Latest run: **41 tests, 41 passed, 0 failures/errors, 0 skipped**, 4.675 seconds.
 The command ran with loopback socket access outside the command sandbox.
 
 Coverage exercised: environment validation and secret redaction; complete
@@ -48,3 +48,12 @@ The placeholders were only for syntax validation, not authentication.
 `bash -n lab/odoo_migration_lab/install.sh` passed. These establish configuration
 and shell syntax only; they do not validate source cloning, legacy builds,
 startup, initialization or migration behavior.
+
+## Updated metadata and inventory behavior
+
+New tests cover strict integer-0/1 boolean normalization without input mutation,
+rejection of other integer values, polymorphic-reference mapping requirements,
+registry visibility/access failure diagnostics, export of complete core metadata
+alongside partial dependency results, and refusal to export incomplete core
+schemas. Updated live probes have not been run against actual servers here.
+User-uploaded detailed environment reports are retained locally, not published.

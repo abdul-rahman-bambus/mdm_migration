@@ -98,13 +98,16 @@ Next, run locally with both applications running and the same eight exported
 connection variables:
 
 ```sh
-python3 -m migration_lab.inventory --output-dir reports/local-inventory-1
+python3 -m migration_lab.inventory --output-dir reports/local-inventory-2
 ```
 
-Share `reports/local-inventory-1/inventory.json`. This only reads installed module
-names and metadata for 15 dependent models. Exit 1 can mean partial evidence;
+Share `reports/local-inventory-2/inventory.json`. This only reads installed module
+names and metadata for three core models plus 15 dependent models. It checks
+registry visibility after metadata failures and includes a UTC capture timestamp. Exit 1 can mean partial evidence;
 errors remain explicit and the report is still useful. Pagination is bounded.
-This inventory command has mocked tests but has not run against the real lab.
+Updated core-refresh and registry-diagnostic behavior has automated mock coverage;
+live behavior still needs validation. When core reads succeed, schema.json is
+exported from the same collection run, even if a dependency check is partial.
 
 Compose/installer startup now requires exported LAB_PG12_PASSWORD and
 LAB_PG20_PASSWORD matching the existing lab databases; see the lab README.

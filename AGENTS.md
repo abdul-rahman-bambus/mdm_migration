@@ -92,12 +92,16 @@ versions 12.0/20.0, and metadata/sample reads on three models. See
 docs/local-connectivity-evidence.md; this is not a cloud integration test.
 Cloud-to-local access and credential bindings remain unavailable here.
 The core schema export is committed and compared under docs/schema-reports/.
-Next: run `python3 -m migration_lab.inventory --output-dir reports/local-inventory-1`
-locally with the existing exported variables. Missing dependency models remain
-explicit partial results. Review module differences before deciding field maps.
+Next: run `python3 -m migration_lab.inventory --output-dir reports/local-inventory-2`
+locally with the existing exported variables. The updated collector refreshes core schemas and checks registry visibility
+after metadata failures. A hidden/missing registry row is not proof of global
+model absence. Preserve explicit partial results and review mappings.
 
 Update README when setup/usage changes, this file when operational rules change,
 and docs/PROJECT_STATUS.md after every meaningful implementation step. Record
 unresolved decisions rather than inventing answers. Keep verified, failed,
 partial, unsupported, planned and untested outcomes separate. Commit logical
 changes when permitted; never claim unexecuted checks passed.
+
+Do not push codex/inventory-review-local: it retains uploaded inventory and
+detailed environment evidence that has not been authorized for publication.

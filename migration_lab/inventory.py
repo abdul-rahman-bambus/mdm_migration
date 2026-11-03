@@ -2,6 +2,7 @@
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .preflight import ProbeFailure, ReadOnlyRPC, Settings
@@ -13,8 +14,9 @@ DEPENDENCIES = (
     "res.partner.category", "res.company", "ir.attachment", "mail.message",
     "mail.followers", "mail.activity",
 )
+CORE_MODELS = ("product.template", "product.product", "res.partner")
 ATTRIBUTES = ["string", "type", "required", "readonly", "relation", "selection",
-              "store", "compute", "related", "company_dependent"]
+              "store", "compute", "related", "company_dependent", "model_field"]
 
 
 def collect(settings, expected_major, timeout=10, max_pages=100):
@@ -59,7 +61,7 @@ def collect(settings, expected_major, timeout=10, max_pages=100):
         result["installed_modules"] = {"state": "failed", "error_category": str(exc),
                                        "names_observed_incomplete": sorted(modules)}
 
-    for model in DEPENDENCIES:
+    for model in CORE_MODELS + DEPENDENCIES:
         try:
             fields = execute(model, "fields_get", [], {"attributes": ATTRIBUTES})
             if not isinstance(fields, dict) or not fields or any(
@@ -69,6 +71,21 @@ def collect(settings, expected_major, timeout=10, max_pages=100):
             result["models"][model] = {"state": "passed", "fields": fields}
         except ProbeFailure as exc:
             result["models"][model] = {"state": "failed", "error_category": str(exc)}
+            # Registry visibility narrows the diagnosis; it does not prove absence
+            # for users whose metadata permissions may be restricted.
+            try:
+                rows = execute("ir.model", "search_read", [[("model", "=", model)]],
+                               {"fields": ["model"], "limit": 1})
+                if rows == []:
+                    visibility = "not_visible_in_registry"
+                elif (isinstance(rows, list) and len(rows) == 1 and isinstance(rows[0], dict)
+                      and rows[0].get("model") == model):
+                    visibility = "visible_in_registry"
+                else:
+                    visibility = "invalid_registry_response"
+                result["models"][model]["registry_visibility"] = visibility
+            except ProbeFailure:
+                result["models"][model]["registry_visibility"] = "registry_query_failed"
     complete = (result["installed_modules"]["state"] == "passed"
                 and all(item["state"] == "passed" for item in result["models"].values()))
     result["state"] = "passed" if complete else "partial"
@@ -87,7 +104,8 @@ def main(argv=None):
         args.output_dir.mkdir(parents=True, exist_ok=False)
     except OSError:
         parser.exit(1, "Choose a new writable output directory.\n")
-    report = {"format_version": 1, "migration_ready": False, "instances": {}}
+    report = {"format_version": 2, "migration_ready": False,
+              "captured_at": datetime.now(timezone.utc).isoformat(), "instances": {}}
     for prefix, major in (("ODOO12", 12), ("ODOO20", 20)):
         try:
             settings = Settings.from_environment(prefix)
@@ -97,6 +115,13 @@ def main(argv=None):
             report["instances"][prefix] = collect(settings, major, args.timeout)
     output = args.output_dir / "inventory.json"
     output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    # Export core metadata from the same collection run, avoiding mixed snapshots.
+    if all(all(instance.get("models", {}).get(model, {}).get("state") == "passed"
+               for model in CORE_MODELS) for instance in report["instances"].values()):
+        snapshot = {prefix: {model: instance["models"][model]["fields"] for model in CORE_MODELS}
+                    for prefix, instance in report["instances"].items()}
+        (args.output_dir / "schema.json").write_text(
+            json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Saved {output}. Missing models and access failures remain explicit in this report.")
     return 0 if all(item["state"] == "passed" for item in report["instances"].values()) else 1
 

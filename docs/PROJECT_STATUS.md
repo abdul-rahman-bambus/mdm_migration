@@ -19,7 +19,7 @@ Use `git log -1 --format=%H` for the latest implementation commit.
   target-only field. No mapping is approved and no business record was written.
 - Read-only installed-module/dependency inventory command implemented and
   tested with mocks, including pagination, repeated pages and partial failures.
-- 34 automated tests passed, 0 failures/errors/skips (5.155s).
+- 41 automated tests passed, 0 failures/errors/skips (4.675s).
 - Compose configuration validation (with non-secret validation placeholders)
   and installer bash syntax validation passed.
 - Replaced uploaded Compose/installer password literals with required exported
@@ -36,8 +36,10 @@ The user-local screenshots establish authentication, server-reported versions
 schema snapshot establishes actual field definitions but not defaults, computed
 status or API writeability. The cloud task still cannot reach the local lab.
 
-Installed modules and 15 dependent-model definitions must be collected using
-the new inventory command. Missing models will remain explicit partial results.
+User-supplied local inventory was received and reviewed. Detailed evidence is
+retained outside the checkout and is not published. Updated core-refresh and
+registry-diagnostic behavior still needs live validation. Failed metadata reads
+remain partial; registry visibility is a diagnostic, not proof of global absence.
 No cloud Odoo build, startup, database initialization or migration was attempted.
 The expected source clones are absent here; installer clone steps and legacy
 build dependencies have not been verified in this cloud environment.
@@ -66,7 +68,7 @@ Environment limitations are distinct from the tested offline capabilities above.
 On the local machine, pull development and run:
 
 ```sh
-python3 -m migration_lab.inventory --output-dir reports/local-inventory-1
+python3 -m migration_lab.inventory --output-dir reports/local-inventory-2
 ```
 
 Use the existing securely exported ODOO12/ODOO20 variables. Share inventory.json
@@ -83,3 +85,19 @@ commit uses environment references, then successfully pushed development.
 The earlier password-literal upload already exists on the user's remote branches;
 no new password-literal commits were added by this push. Main was unchanged.
 The tested implementation files were preserved during branch synchronization.
+
+## Latest tooling increment
+
+The collector now includes core schemas alongside dependency metadata, a UTC
+capture time, and registry-visibility diagnostics after failed reads. It exports
+schema.json only when all core metadata succeeds. The comparator accepts only
+integer 0/1 as boolean metadata, records that normalization, and explicitly flags
+polymorphic references for ID mapping. No mapping is automatically approved.
+
+All 41 automated tests pass. The newly updated live diagnostics have not yet
+run against real servers. Automatic approval review rejected publication of the
+uploaded inventory and detailed environment reports. Those files were retained
+outside the checkout and omitted from development history; this increment
+publishes code/tests and general usage documentation only. The private local
+review commit is preserved under codex/inventory-review-local and must not be
+pushed without authorization. No migration writes or reconciliation occurred.

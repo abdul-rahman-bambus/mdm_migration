@@ -16,8 +16,8 @@ Main is unchanged. Private inventory/review branches must not be pushed.
   environment/model/record identities, payload fingerprints, mapping version,
   transactionally committed reconciliation and PostgreSQL worker locking.
 - Target restore/ID conflicts fail closed; automatic restore recovery is not built.
-- 66 standard tests passed (3.776s), 0 failures/errors/skips.
-- 12 integration tests passed (10.314s), 0 failures/errors/skips, using real
+- 72 standard tests passed (4.695s), 0 failures/errors/skips.
+- 15 integration tests passed (13.558s), 0 failures/errors/skips, using real
   PostgreSQL and synthetic version-12/version-20 XML-RPC HTTP servers.
 - CLI seed/dry-run/apply/rerun/update/status lifecycle passed against those fixtures.
 - Actual PostgreSQL tests exercised locking, lost source/target acknowledgements,
@@ -67,15 +67,31 @@ volumes, delete mappings or bypass reconciliation to make a check pass.
 
 ## Journal startup diagnostic correction
 
-Local acceptance is currently blocked at journal connection, before any Odoo
-pilot write. The specific cause is still unconfirmed; the earlier generic code
+Earlier local acceptance was blocked at journal connection, before any Odoo
+pilot write. Journal initialization has since succeeded locally. The specific cause is still unconfirmed; the earlier generic code
 hid it. Replaced Unix-socket readiness with TCP readiness and added journal-check
 with allowlisted categories/diagnostics. Startup-only connection retries are
 bounded at three and exclude authentication/configuration failures. Failed
 connections close cleanly. No existing journal password/volume was changed.
 
-Latest validation: 66 standard tests passed (3.776s) and 12 integration tests
-passed (10.314s). Actual wrong-password classification and a history-preserving,
+Latest validation: 72 standard tests passed (4.695s) and 15 integration tests
+passed (13.558s). Actual wrong-password classification and a history-preserving,
 Odoo-independent journal-check were exercised against owned PostgreSQL. A
 socket-only PostgreSQL probe separately reproduced the old readiness false
 positive. New diagnostics still need execution on the user's computer.
+
+## Required native-default correction
+
+Local pilot seed/sync was blocked by the extra-required-field guard before
+creating a contact. The guard incorrectly rejected native defaults during
+connection setup. Create validation now queries default_get only when needed,
+checks supported default types (including false/zero), leaves defaults to the
+same server's ORM, and reports unresolved field names without values. It does
+not copy extra fields or expand the mapping. Dry-run reports default field names.
+
+Validated 72 unit/protocol tests (4.695s) and 15 real-PostgreSQL/synthetic-Odoo
+integration tests (13.558s). New integration cases cover distinct source/target
+defaults, unchanged payload scope, missing-default rejection before create intent,
+correction without clearing history, and existing reads/updates without create
+preconditions. Actual local Odoo create/reconciliation still awaits rerun.
+No schema change, volume reset, password change or new package is required.

@@ -21,6 +21,9 @@ class MemoryAPI:
             raise PilotError("duplicate_or_invalid_pilot_marker")
         return rows[0] if rows else None
 
+    def validate_create(self):
+        return []
+
     def create(self, values):
         self.creates += 1
         key = max(self.rows, default=0) + 1

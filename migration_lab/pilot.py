@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 import re
 import urllib.parse
 from pathlib import Path
@@ -16,15 +17,39 @@ CONTEXT = {"active_test": False, "tracking_disable": True, "mail_create_nosubscr
            "mail_create_nolog": True, "mail_notify_force_send": False}
 
 
-class PilotRPC(ReadOnlyRPC):
+class PilotReadRPC(ReadOnlyRPC):
+    OPERATIONS = ReadOnlyRPC.OPERATIONS | {"default_get"}
+
+
+class PilotRPC(PilotReadRPC):
     # The assessment client itself remains read-only.
-    OPERATIONS = ReadOnlyRPC.OPERATIONS | {"create", "write"}
+    OPERATIONS = PilotReadRPC.OPERATIONS | {"create", "write"}
+
+
+def usable_default(metadata, value):
+    """Only validate server-owned defaults; never invent/copy their values."""
+    kind = metadata.get("type")
+    if kind == "boolean":
+        return type(value) is bool
+    if kind in {"integer", "float", "monetary"}:
+        return type(value) in (int, float) and math.isfinite(value)
+    if kind == "many2one":
+        return type(value) is int and value > 0
+    if kind == "selection":
+        if type(value) not in (str, int) or value == "":
+            return False
+        selections = metadata.get("selection")
+        return selections is None or value in [item[0] for item in selections]
+    if kind in {"char", "text", "html", "date", "datetime"}:
+        return isinstance(value, str) and bool(value.strip())
+    # Computed/relational fields with no understood default remain unresolved.
+    return False
 
 
 class PartnerAPI:
     def __init__(self, settings, major, writable=False):
         self.settings, self.major, self.writable = settings, major, writable
-        self.rpc = PilotRPC(settings) if writable else ReadOnlyRPC(settings)
+        self.rpc = PilotRPC(settings) if writable else PilotReadRPC(settings)
         version = self.rpc.call("common", "version")
         info = version.get("server_version_info") if isinstance(version, dict) else None
         if not isinstance(info, (list, tuple)) or not info or info[0] != major:
@@ -32,16 +57,36 @@ class PartnerAPI:
         self.uid = self.rpc.call("common", "authenticate", settings.database, settings.username, settings.password, {})
         if type(self.uid) is not int or self.uid <= 0:
             raise PilotError("authentication_failed")
-        metadata = self.execute("fields_get", [], {"attributes": ["type", "readonly", "required"]})
+        metadata = self.execute("fields_get", [], {"attributes": ["type", "readonly", "required", "selection"]})
         if not isinstance(metadata, dict):
             raise PilotError("invalid_partner_metadata")
         for name in FIELDS + ("ref",):
             meta = metadata.get(name, {})
             if meta.get("type") != "char" or meta.get("readonly") not in (False, 0):
                 raise PilotError("unsupported_pilot_field_metadata")
-        if any(meta.get("required") and not meta.get("readonly")
-                            for name, meta in metadata.items() if name not in FIELDS + ("ref",)):
-            raise PilotError("extra_required_partner_field_requires_mapping")
+        self.metadata = metadata
+        self._default_fields = None
+
+    def validate_create(self):
+        if self._default_fields is not None:
+            return list(self._default_fields)
+        required = sorted(name for name, meta in self.metadata.items()
+                          if name not in FIELDS + ("ref",) and meta.get("required") and not meta.get("readonly"))
+        try:
+            defaults = self.execute("default_get", [required]) if required else {}
+        except ProbeFailure as exc:
+            raise PilotError("required_partner_defaults_unavailable",
+                             {"server_major": self.major, "model": "res.partner", "fields": required,
+                              "error_category": str(exc)}) from None
+        if not isinstance(defaults, dict):
+            raise PilotError("invalid_partner_defaults_response")
+        unresolved = [name for name in required
+                      if name not in defaults or not usable_default(self.metadata[name], defaults[name])]
+        if unresolved:
+            raise PilotError("extra_required_partner_field_requires_mapping",
+                             {"server_major": self.major, "model": "res.partner", "fields": unresolved})
+        self._default_fields = required
+        return list(required)
 
     def execute(self, method, args, kwargs=None):
         return self.rpc.call("object", "execute_kw", self.settings.database, self.uid,
@@ -60,6 +105,7 @@ class PartnerAPI:
     def create(self, values):
         if not self.writable or set(values) != set(FIELDS + ("ref",)):
             raise PilotError("pilot_write_scope_violation")
+        self.validate_create()
         result = self.execute("create", [values])
         if type(result) is not int or result <= 0:
             raise PilotError("invalid_create_response")
@@ -122,6 +168,8 @@ def migrate(source, target, journal, spec, source_identity, target_identity, act
             if action == "seed" and row is None:
                 if journal.has_intent(namespace, "source_create_intent"):
                     raise PilotError("unresolved_source_create_requires_review")
+                default_fields = source.validate_create()
+                journal.event(run_id, "source_defaults_validated", fields=default_fields)
                 journal.event(run_id, "source_create_intent")
                 source.create({"ref": spec["source_marker"], "name": spec["name"],
                                "email": spec["email"], "phone": "+12025550100"})
@@ -163,12 +211,14 @@ def migrate(source, target, journal, spec, source_identity, target_identity, act
             digest = hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()
             changed = list(FIELDS) if not destination else [key for key in FIELDS if values[key] != payload(destination)[key]]
             operation = "create" if destination is None else ("update" if changed else "no_change")
-            journal.event(run_id, "validated", operation=operation, fields=changed)
+            default_fields = target.validate_create() if operation == "create" else []
+            journal.event(run_id, "validated", operation=operation, fields=changed, server_default_fields=default_fields)
             if not apply:
                 journal.event(run_id, "dry_run", operation=operation, fields=changed)
                 journal.finish(run_id, "dry_run", source_id, target_id, digest)
                 return {"run_id": run_id, "state": "dry_run", "proposed_operation": operation,
-                        "fields": changed, "source_id": source_id, "target_id": target_id}
+                        "fields": changed, "server_default_fields": default_fields,
+                        "source_id": source_id, "target_id": target_id}
             journal.event(run_id, "load_intent", operation=operation, target_id=target_id)
             if operation == "create":
                 target_id = target.create({"ref": spec["target_marker"], **values})
@@ -184,7 +234,8 @@ def migrate(source, target, journal, spec, source_identity, target_identity, act
                 raise PilotError("target_reconciliation_failed")
             journal.reconciled(namespace, run_id, source_id, target_id, spec["target_marker"], VERSION, digest)
             return {"run_id": run_id, "state": "reconciled", "operation": operation,
-                    "source_id": source_id, "target_id": target_id, "fields_verified": list(FIELDS)}
+                    "source_id": source_id, "target_id": target_id, "fields_verified": list(FIELDS),
+                    "server_default_fields": default_fields}
         except (PilotError, ProbeFailure) as exc:
             journal.event(run_id, "failed", error_code=str(exc))
             journal.finish(run_id, "failed", source_id, target_id, digest, str(exc))

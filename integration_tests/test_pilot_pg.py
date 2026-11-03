@@ -20,6 +20,8 @@ class RPCPartnerFixture:
     def __init__(self, major):
         self.major, self.rows, self.calls = major, {}, []
         self.lose_response = self.corrupt = self.reject_create = False
+        self.required_fields, self.defaults = {}, {}
+        self.last_create_values = None
 
     def __enter__(self):
         fixture = self
@@ -43,15 +45,20 @@ class RPCPartnerFixture:
                     if method == "fields_get":
                         result = {name: {"type": "char", "readonly": False, "required": False}
                                   for name in ("name", "email", "phone", "ref")}
+                        result.update(fixture.required_fields)
+                    elif method == "default_get":
+                        result = {name: fixture.defaults[name] for name in positional[0] if name in fixture.defaults}
                     elif method == "search_read":
                         marker = positional[0][0][2]
-                        result = [dict(row) for row in fixture.rows.values() if row["ref"] == marker][:2]
+                        result = [{name: row.get(name, False) for name in kwargs["fields"]}
+                                  for row in fixture.rows.values() if row["ref"] == marker][:2]
                     elif method == "create":
                         if fixture.reject_create:
                             self.respond(xmlrpc.client.Fault(1, "simulated rejected create"))
                             return
                         key = max(fixture.rows, default=fixture.major * 100) + 1
-                        fixture.rows[key] = {"id": key, **positional[0]}
+                        fixture.last_create_values = dict(positional[0])
+                        fixture.rows[key] = {**fixture.defaults, **positional[0], "id": key}
                         if fixture.corrupt:
                             fixture.rows[key]["phone"] = "+12025550199"
                         if fixture.lose_response:
@@ -237,3 +244,46 @@ class PostgresPilotTests(unittest.TestCase):
         self.assertEqual(json.loads(output.getvalue())["state"], "journal_connected")
         self.assertEqual(before, self.journal.status(self.spec["namespace"]))
         self.assertEqual(calls, len(self.source.calls) + len(self.target.calls))
+
+    def test_server_owned_required_defaults_allow_create_without_copying_extra_fields(self):
+        self.spec = specification("defaults-" + uuid.uuid4().hex[:18], "fixture-source", "fixture-target")
+        for fixture, company in ((self.source, 11), (self.target, 55)):
+            fixture.required_fields = {
+                "company_type": {"type": "selection", "required": True, "readonly": False,
+                                 "selection": [["person", "Person"], ["company", "Company"]]},
+                "company_id": {"type": "many2one", "required": True, "readonly": False},
+            }
+            fixture.defaults = {"company_type": "person", "company_id": company}
+            fixture.api = PartnerAPI(fixture.api.settings, fixture.major, writable=True)
+        self.assertEqual(self.action("seed")["state"], "seeded")
+        dry_run = self.action()
+        self.assertEqual(dry_run["server_default_fields"], ["company_id", "company_type"])
+        self.assertEqual(len(self.target.rows), 0)
+        result = self.action(apply=True)
+        self.assertEqual(result["state"], "reconciled")
+        self.assertEqual(self.target.rows[result["target_id"]]["company_id"], 55)
+        self.assertEqual(set(self.target.last_create_values), {"name", "email", "phone", "ref"})
+        self.assertNotIn("company_type", self.source.last_create_values)
+
+    def test_missing_required_default_blocks_before_intent_and_can_be_corrected(self):
+        self.target.required_fields = {"required_note": {"type": "char", "required": True, "readonly": False}}
+        self.target.api = PartnerAPI(self.target.api.settings, 20, writable=True)
+        with self.assertRaises(PilotError) as caught:
+            self.action(apply=True)
+        self.assertEqual(caught.exception.diagnostics["fields"], ["required_note"])
+        self.assertFalse(self.journal.has_intent(self.spec["namespace"], "load_intent", "create"))
+        self.assertEqual(len(self.target.rows), 0)
+        # Correct the synthetic server configuration; history/record mappings
+        # remain intact and no ambiguous write was attempted before correction.
+        self.target.defaults["required_note"] = "fixture-default"
+        self.assertEqual(self.action(apply=True)["state"], "reconciled")
+
+    def test_existing_source_reads_and_target_updates_do_not_require_create_defaults(self):
+        self.action(apply=True)
+        for fixture in (self.source, self.target):
+            fixture.required_fields = {"required_note": {"type": "char", "required": True, "readonly": False}}
+            fixture.api = PartnerAPI(fixture.api.settings, fixture.major, writable=True)
+        self.action("change-source", phone="+12025550123")
+        self.assertEqual(self.action(apply=True)["operation"], "update")
+        calls = [args[4] for operation, args in self.source.calls + self.target.calls if operation == "execute_kw"]
+        self.assertNotIn("default_get", calls)

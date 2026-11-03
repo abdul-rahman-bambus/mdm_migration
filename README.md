@@ -134,3 +134,8 @@ For journal startup failures, run `python -m migration_lab.pilot journal-check
 --lab-only` on one line. It checks connectivity without initialization or Odoo
 calls and returns secret-free error categories. See the troubleshooting section
 of docs/contact-pilot.md; retain the original journal password and volume.
+
+The pilot honors usable Odoo-owned defaults for extra required partner fields
+without adding them to the migration payload. Dry-run lists their names only;
+unresolved fields still block with safe diagnostics. Reads/updates do not run
+unrelated create checks. See the required-fields section in docs/contact-pilot.md.

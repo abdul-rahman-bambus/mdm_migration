@@ -6,9 +6,9 @@ Command from `/workspace/mdm_migration`:
 python3 -m unittest discover -s tests -v
 ```
 
-Latest run: **66 tests, 66 passed, 0 failures/errors, 0 skipped**, 3.776 seconds.
-Additional pilot integration suite: **12 tests, 12 passed**, 0 failures/errors/skips,
-10.314 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
+Latest run: **72 tests, 72 passed, 0 failures/errors, 0 skipped**, 4.695 seconds.
+Additional pilot integration suite: **15 tests, 15 passed**, 0 failures/errors/skips,
+13.558 seconds, using real PostgreSQL and synthetic Odoo HTTP servers.
 The command ran with loopback socket access outside the command sandbox.
 
 Coverage exercised: environment validation and secret redaction; complete
@@ -69,7 +69,7 @@ mapped target IDs, journal-intent failure before target write, repeatable seed,
 lab endpoint/database restrictions, mapping manifest tampering and phone guards.
 
 Integration command: `.venv/bin/python scripts/run_pilot_integration.py`.
-Twelve tests used a real independent PostgreSQL container and two synthetic Odoo
+Fifteen tests used a real independent PostgreSQL container and two synthetic Odoo
 XML-RPC HTTP servers. They exercised CLI lifecycle, actual locking and durable
 history, lost source/target create acknowledgements, process interruption/new
 connection retry, read-back mismatch rollback of success/mapping, target loss
@@ -98,3 +98,14 @@ ports, failed-connection cleanup, read-only CLI checks and safe CLI failures.
 Two added real PostgreSQL tests verify wrong-password categorization without
 secret output and journal-check leaving history/Odoo calls unchanged.
 The connection root cause on the user's local machine remains unconfirmed.
+
+## Native partner defaults
+
+Six added unit tests validate false/zero defaults, invalid defaults/selections,
+cache behavior, safe missing/default-discovery diagnostics and the read-only
+pilot default_get adapter. Three added real PostgreSQL/HTTP tests verify distinct
+server-owned defaults are not copied across environments or inserted into the
+pilot payload, missing defaults block before intent and can be corrected without
+history resets, and existing records can be read/updated without create checks.
+Latest results: 72 standard tests and 15 integration tests passed. Real local
+Odoo defaults and writes are not claimed verified by these synthetic tests.

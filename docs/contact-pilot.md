@@ -8,8 +8,10 @@ existing business contacts, roles, companies, addresses, images or attachments.
 
 The worker is restricted to loopback Odoo ports 8012/8020 and databases
 odoo12_demo/odoo20_migration. It authenticates and inspects the actual four
-required char fields before writing. Extra mandatory writable fields block the
-pilot rather than being filled with invented defaults. Every pilot command
+required char fields before writing. Before a create, additional mandatory writable fields are checked with Odoo
+default_get. Usable server-owned defaults are left to the ORM; they are never
+copied from the source or added to the pilot payload. Fields without usable
+defaults still block the pilot, with their names in safe diagnostics. Every pilot command
 requires `--lab-only`.
 
 ## 1. Pull and install
@@ -188,3 +190,22 @@ docker compose -f lab/journal.compose.yaml port journal 5432
 Keep the existing exported journal password while checking. No Odoo connection
 settings are required for journal-check or init-journal. Proceed to seed/sync
 only after journal initialization succeeds.
+
+## Additional required fields
+
+The pilot originally rejected all additional mandatory partner fields during
+connection setup. It now validates native defaults only before a new contact
+create. Existing source reads and target updates do not require create defaults.
+The dry run reports server_default_fields as names only. Payload scope remains
+name/email/phone plus ref; no extra values are copied or invented.
+
+Usable defaults include native boolean false and numeric zero. Empty strings,
+invalid selections, missing relational identities and unknown default types
+remain blocked. Computed behavior is not guessed from metadata. Defaults are
+queried with the same authenticated user/context as create and refreshed on each
+CLI invocation. Actual create and read-back reconciliation still decide success.
+
+Missing-default failures occur before durable create intent, so fixing a real
+configuration/mapping problem does not leave an ambiguous write attempt. Existing
+runs/history are preserved. When blocked, share only the safe JSON error showing
+server_major/model/field names; do not add guessed values or reset any database.

@@ -73,3 +73,13 @@ Use the existing securely exported ODOO12/ODOO20 variables. Share inventory.json
 from that directory even if exit status is 1; partial errors need diagnosis.
 Do not restart services, rerun the installer or reset any database for this check.
 Use a new output directory for each subsequent inventory run.
+
+## Remote synchronization
+
+The user subsequently merged the original lab history into remote development
+at 6d59aab. That update was merged locally at 4f9eab8, retaining the sanitized
+Compose/installer files. Verified that every newly introduced Compose-bearing
+commit uses environment references, then successfully pushed development.
+The earlier password-literal upload already exists on the user's remote branches;
+no new password-literal commits were added by this push. Main was unchanged.
+The tested implementation files were preserved during branch synchronization.

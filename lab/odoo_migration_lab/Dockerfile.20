@@ -1,0 +1,8 @@
+FROM python:3.12-bookworm
+ENV DEBIAN_FRONTEND=noninteractive PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential libpq-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev libjpeg-dev zlib1g-dev libffi-dev libssl-dev libfreetype6-dev liblcms2-dev libopenjp2-7-dev node-less npm && rm -rf /var/lib/apt/lists/*
+RUN python -m venv /opt/venv && /opt/venv/bin/pip install --upgrade pip setuptools wheel
+COPY source/odoo20/requirements.txt /tmp/requirements.txt
+RUN /opt/venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt
+WORKDIR /opt/odoo
+EXPOSE 8069

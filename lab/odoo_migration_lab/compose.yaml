@@ -1,0 +1,64 @@
+services:
+  pg12:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: lab_odoo_12_change_me
+      POSTGRES_DB: postgres
+    volumes:
+      - pg12_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 5s
+      retries: 30
+  pg20:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: lab_odoo_20_change_me
+      POSTGRES_DB: postgres
+    volumes:
+      - pg20_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 5s
+      retries: 30
+  odoo12:
+    build:
+      context: .
+      dockerfile: Dockerfile.12
+    depends_on:
+      pg12:
+        condition: service_healthy
+    environment:
+      PGHOST: pg12
+      PGUSER: odoo
+      PGPASSWORD: lab_odoo_12_change_me
+    ports:
+      - "127.0.0.1:8012:8069"
+    volumes:
+      - odoo12_data:/var/lib/odoo
+      - ./source/odoo12:/opt/odoo:ro
+    command: ["/opt/venv/bin/python", "/opt/odoo/odoo-bin", "--db_host=pg12", "--db_user=odoo", "--db_password=lab_odoo_12_change_me", "--db-filter=^odoo12_demo$", "--database=odoo12_demo", "--http-interface=0.0.0.0", "--http-port=8069", "--data-dir=/var/lib/odoo"]
+  odoo20:
+    build:
+      context: .
+      dockerfile: Dockerfile.20
+    depends_on:
+      pg20:
+        condition: service_healthy
+    environment:
+      PGHOST: pg20
+      PGUSER: odoo
+      PGPASSWORD: lab_odoo_20_change_me
+    ports:
+      - "127.0.0.1:8020:8069"
+    volumes:
+      - odoo20_data:/var/lib/odoo
+      - ./source/odoo20:/opt/odoo:ro
+    command: ["/opt/venv/bin/python", "/opt/odoo/odoo-bin", "--db_host=pg20", "--db_user=odoo", "--db_password=lab_odoo_20_change_me", "--db-filter=^odoo20_migration$", "--database=odoo20_migration", "--http-interface=0.0.0.0", "--http-port=8069", "--data-dir=/var/lib/odoo"]
+volumes:
+  pg12_data:
+  pg20_data:
+  odoo12_data:
+  odoo20_data:

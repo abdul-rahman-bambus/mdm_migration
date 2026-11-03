@@ -1,8 +1,9 @@
 # Known limitations
 
 - The Odoo lab exists on the user's local machine, not in this cloud workspace.
-- Real server versions, endpoints, schemas, modules and credentials are unverified.
-- No live database/API authentication or migration test has succeeded here.
+- Local screenshots show successful XML-RPC authentication and server-reported
+  versions 12.0/20.0. Full schemas, source provenance and modules are unverified.
+- No direct cloud-to-Odoo authentication or migration test has succeeded here.
 - Current tooling is a read-only XML-RPC assessment, not full connection adapters.
 - General search/create/write, pagination, retries, schema export/comparison,
   module inventory, migrations, journal, mappings, recovery and UI are not built.

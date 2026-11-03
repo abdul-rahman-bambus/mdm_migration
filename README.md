@@ -38,6 +38,16 @@ not write data. Reports go to stdout; no record contents, passwords or raw remot
 faults are emitted. Exit 0 means the implemented connectivity checks passed;
 it does not establish migration readiness. Empty sample sets are reported.
 This command has passed against synthetic fixtures, **not real Odoo servers**.
+A separate inline probe run by the user succeeded against the local Odoo
+servers. See [local connectivity evidence](docs/local-connectivity-evidence.md).
+The cloud workspace still has no direct connection to those services.
+
+The standalone `scripts/export_local_schema.py` exports metadata from the three
+core models using those same variables and loopback endpoints. Run it locally
+with `python3 scripts/export_local_schema.py` once that file is available there.
+It writes a new timestamped `odoo-schema-*.json` file without overwriting existing
+files. Inspect any `error_type` entries before treating an export as complete.
+It has mock-based tests but has not yet run against the real local lab.
 
 ## Current lab and planned architecture
 

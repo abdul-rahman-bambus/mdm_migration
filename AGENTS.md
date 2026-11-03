@@ -19,6 +19,7 @@ are out of scope without separate approval. No production access is authorized.
 
 - `migration_lab/`: dependency-free Python assessment CLI, currently read-only.
 - `tests/`: unittest tests using synthetic loopback XML-RPC fixtures.
+- `scripts/export_local_schema.py`: portable loopback-only metadata exporter.
 - `.env.example`: variable names and non-secret lab defaults only.
 - `docs/`: assessment, architecture, connectivity, test evidence and status.
 - `test`: original repository placeholder; preserve it.
@@ -75,10 +76,12 @@ prerequisites. Real migration tests must use synthetic data only.
 Implemented: assessment CLI, safe configuration validation, bounded read-only
 XML-RPC probes and synthetic protocol tests. Not implemented: migration writes,
 schema comparison, journal, mappings, reconciliation, dashboard and recovery.
-Live APIs and claimed Odoo 20 installation are unverified. Cloud-to-local access
-and credential bindings are blockers. See docs/PROJECT_STATUS.md for evidence.
-Next: connect the actual lab, verify versions/connectivity, inventory models and
-modules, then design adapters and schema discovery against observed behavior.
+User-local screenshot evidence confirms XML-RPC authentication, server-reported
+versions 12.0/20.0, and metadata/sample reads on three models. See
+docs/local-connectivity-evidence.md; this is not a cloud integration test.
+Cloud-to-local access and credential bindings remain unavailable here.
+Next: export actual field definitions and installed modules from the local lab,
+then design adapters and schema comparison against observed behavior.
 
 Update README when setup/usage changes, this file when operational rules change,
 and docs/PROJECT_STATUS.md after every meaningful implementation step. Record

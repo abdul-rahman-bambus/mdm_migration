@@ -102,9 +102,11 @@ def row(kind, data):
         require(isinstance(data["state"], str) and data["state"] in EVENT_STATES)
         timestamp(data["created_at"])
         details = data["details"]
-        require(isinstance(details, dict) and set(details) <= {"fields", "server_default_fields", "operation", "source_id", "target_id", "error_code"})
+        require(isinstance(details, dict) and set(details) <= {"fields", "server_default_fields", "operation", "source_id", "target_id", "error_code", "messages", "attachments", "tracking_changes"})
         for key, value in details.items():
-            if key in {"fields", "server_default_fields"}:
+            if key in {"messages", "attachments", "tracking_changes"}:
+                require(type(value) is int and 0 <= value <= MAX_ROWS)
+            elif key in {"fields", "server_default_fields"}:
                 require(isinstance(value, list) and len(value) <= 100)
                 for name in value:
                     text(name, r"[A-Za-z_][A-Za-z0-9_]{0,127}")

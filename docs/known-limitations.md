@@ -3,7 +3,8 @@
 - The Odoo lab exists on the user's local machine, not in this cloud workspace.
 - Local screenshots show successful XML-RPC authentication and server-reported
   versions 12.0/20.0. Full schemas, source provenance and modules are unverified.
-- No direct cloud-to-Odoo authentication or migration test has succeeded here.
+- The cloud cannot access the user's local Odoo lab. Separate disposable native
+  Odoo 20 integration tests do not establish that local installation is ready.
 - Assessment tooling remains read-only. A separately guarded synthetic contact
   pilot has been added; general business-data adapters are not complete.
 - General migration adapters, bulk processing, approved business mappings,
@@ -29,3 +30,14 @@
   scope. Retention, per-company/OPCO rules and UI Start/Retry workflows remain
   unimplemented; see migration-control-center.md. Monitoring reports historical
   evidence and does not perform fresh reconciliation or repair restored targets.
+
+- A separate 1–5 contact/history trial is implemented; see contact-history-trial.md.
+  It copies scoped contact fields (including Tax ID/country), checks native
+  company classification, and imports readable chatter/field changes and bounded
+  binary files. It does not copy all contact data, native tracking relationships,
+  rich HTML, followers, activities, recipients or custom log tables. Target
+  notes are internal and source authors are labels, not impersonated users.
+  Independent IDs/digests and target receipts guard reruns/restore conflicts;
+  automatic merge, conflict correction and full restore recovery remain unbuilt.
+  Source collection spans RPC reads, not one database snapshot: pause changes
+  to selected trial records. The actual user-local source still needs acceptance.

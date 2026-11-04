@@ -1,4 +1,36 @@
-# Test results — 2026-11-03
+# Test results — latest 2026-11-04
+
+## Contact history trial
+
+- Standard suite: 87 tests passed, 0 failures/errors/skips (3.742s).
+- Existing PostgreSQL/HTTP suite: 16 tests passed (14.525s); no prior behavior
+  regressed after additive journal tables and the safe RPC diagnostic hook.
+- Official Odoo 20 runner: 40 native addon tests, 0 failures/errors. Real native
+  contact/mail/attachment behavior covers historical dates/labels/subject/body,
+  exact binary bytes, privacy, no outgoing mail/notifications/followers/activities,
+  atomic rollback, lost-ack idempotence, immutable source history, target drift,
+  independent restore expectations, candidate duplicates, native ACLs, archived
+  companies, ISO country mappings and incompatible company-classification guards.
+- Full host worker with real PostgreSQL/Odoo 20 and synthetic Odoo 12-shaped RPC
+  source passed preview, committed-but-unacknowledged import, no-duplicate retry,
+  rerun, changed-source rejection, reviewed update, durable history ID/digest
+  mappings and metadata-only journal monitor transfer. Odoo's XML-RPC transport
+  uses false for missing IDs; no nil-valued custom responses are emitted.
+- Chromium passed existing dashboard/list/drill-down checks and opened the new
+  history contact through tracking, verifying readable historical note, original
+  author label and linked file. No page errors. Redacted logs and synthetic
+  screenshots/result.json remain ignored in reports/control-integration/.
+- pip check and git diff --check passed. Test containers/network/tmpfs are owned
+  disposable resources; no existing lab service/volume/database was modified.
+
+These results do not establish actual Odoo 12 source compatibility or client
+customization support. Local selected-contact acceptance is still required.
+Official public Odoo 12 mail.message/mail.tracking.value definitions were also
+inspected: source message types match the contract, tracking has its own
+monetary columns, and booleans use integer storage. Extraction regression checks
+verify those monetary/boolean distinctions. The standard source tracking
+relation requires base.group_system permissions; no source ACL bypass is used.
+Earlier incremental evidence from 2026-11-03 follows below.
 
 Command from `/workspace/mdm_migration`:
 

@@ -98,7 +98,10 @@ class ReadOnlyRPC:
         except ProbeFailure:
             raise
         except Exception as exc:
-            raise ProbeFailure(classify(exc)) from None
+            raise ProbeFailure(self.failure_code(exc)) from None
+
+    def failure_code(self, exc):
+        return classify(exc)
 
 
 def assess(settings, expected_major, timeout=10):

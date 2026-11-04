@@ -69,11 +69,13 @@ background retry requests and UI-triggered execution remain future work. See [ar
 
 ## Development status
 
-Product/partner/image/attachment migration, chatter preservation, approved schema mapping,
+General product/partner/image/attachment migration, full native chatter preservation, approved schema mapping,
 general ID tracking, multi-model reconciliation, approval workflows, exports
 and broader execution workflows remain planned. The contact pilot implements
 ID mapping, history and reconciliation. User-local create/rerun/update results
-were supplied successfully; the new monitoring UI awaits local installation.
+were supplied successfully. A separate bounded contact/history trial now extends
+this preparation; see the runbook below. Monitoring UI acceptance in the local
+lab remains pending.
 No enterprise migration or migration throughput claim is made.
 
 Connection failures are categorized as configuration, network, timeout, HTTP,
@@ -177,3 +179,20 @@ Validated with real PostgreSQL, the official Odoo 20 image, native addon tests,
 and Chromium. The integration test migrates a synthetic contact into actual
 Odoo 20 from a synthetic Odoo 12 server, then imports its real journal history.
 Local UI installation in your running lab remains the next acceptance step.
+
+## Contact trial with historical chatter and attachments
+
+The separate `migration_lab.contact_history` command previews 1–5 explicitly
+selected top-level lab contacts, then imports the reviewed snapshot with explicit
+`--apply`. It copies name/email/phone/active/Tax ID, maps countries by code and
+checks native company classification, plus readable historical
+notes/messages, tracked changes as text and bounded binary attachments. Original
+author labels and message dates are retained without impersonation. There is no
+historical notification dispatch. This is a limited contact mapping, not a full
+customer/vendor or custom MDM migration.
+
+Upgrade the tracking addon, assign its separate Contact Trial Migrator role and
+initialize the additive history journal table first. Follow the exact
+[contact-history trial runbook](docs/contact-history-trial.md) for selection,
+preview/apply/rerun, monitoring, preservation limits and conflict handling.
+The original synthetic-only pilot remains available with its original scope.

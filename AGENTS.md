@@ -133,7 +133,7 @@ one authoritative journal for locking/idempotence. Mark success only after
 read-back reconciliation. Block source/target identity conflicts and target
 restore/missing-mapping situations for review; do not auto-delete/recreate them.
 
-Standard tests: python -m unittest discover -s tests -v (78 tests at this update).
+Standard tests: python -m unittest discover -s tests -v (87 tests at this update).
 Optional integration: python scripts/run_pilot_integration.py (16 tests), after
 installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
 container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
@@ -180,5 +180,30 @@ arbitrary commands from web requests. Do not put journal passwords in Odoo.
 Native addon/browser validation: python scripts/run_control_integration.py,
 after requirements-control-test.txt, Docker and Chromium. It owns disposable
 Odoo/PostgreSQL containers/network/tmpfs only and never touches existing lab
-services/volumes. Current results: 22 native Odoo tests plus browser smoke passed.
+services/volumes. Current results: 40 native Odoo tests plus browser smoke passed.
 Keep redacted test logs/screenshots under ignored reports/, not in Git.
+
+## Contact-history trial rules
+
+User authorized a small contact/chatter/attachment trial; this does not authorize
+the full custom MDM application. Separate migration_lab/contact_history.py from
+the original synthetic-only worker. Accept 1–5 explicit top-level contact IDs,
+preview and reviewed source digest before --apply. Keep source read-only. Fields
+are name/email/phone/active/Tax ID, country by ISO code and checked is_company;
+document omitted mappings. Never force readonly company classification or invent
+VAT values; target/source classification disagreement blocks preview. Exclude
+user-account contacts/children; block unsupported or inaccessible history.
+
+The addon execution API requires Contact Trial Migrator and odoo20_migration,
+separate from monitor permissions. No arbitrary web commands. Keep actual contact,
+mail.message and ir.attachment access under caller ACLs. Only protected identity
+receipts use sudo. Never message_post, notify, subscribe or send historical mail.
+Preserve original dates/author labels; transform field changes to readable text,
+not foreign native field IDs. Do not claim rich HTML/native tracking fidelity.
+
+One atomic Odoo transaction per contact with target receipts; separate committed
+read-back before independent journal success. Keep durable per-message/file
+IDs/digests, lost-ack idempotence and restore/conflict guards. No automatic merge,
+history edits/deletes, target overwrite after drift, or volume resets. Journal
+mirror receives safe counts only; raw business histories never enter Git or
+monitor metadata. See docs/contact-history-trial.md for limits and acceptance.

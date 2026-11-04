@@ -71,6 +71,12 @@ CREATE TABLE IF NOT EXISTS bambus_pilot.mappings (
     payload_digest text NOT NULL, last_run uuid NOT NULL REFERENCES bambus_pilot.runs(id),
     state text NOT NULL CHECK (state = 'reconciled'), updated_at timestamptz NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS bambus_pilot.history_items (
+    namespace text NOT NULL, kind text NOT NULL CHECK (kind IN ('message','attachment')),
+    source_id bigint NOT NULL, target_id bigint NOT NULL, payload_digest text NOT NULL,
+    last_run uuid NOT NULL REFERENCES bambus_pilot.runs(id),
+    PRIMARY KEY(namespace,kind,source_id)
+);
 """
 
 

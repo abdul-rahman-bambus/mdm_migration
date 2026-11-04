@@ -1,0 +1,15 @@
+<odoo>
+    <record id="partner_trial_classification" model="ir.ui.view">
+        <field name="name">Contact trial source classification</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='identifiers']" position="after">
+                <div class="o_wrap_label" invisible="bambus_legacy_classification == 'native'">
+                    <label for="bambus_legacy_classification" string="Imported contact type"/>
+                    <div><field name="bambus_legacy_classification" nolabel="1" readonly="1"/></div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

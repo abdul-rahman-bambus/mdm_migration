@@ -200,3 +200,10 @@ The original synthetic-only pilot remains available with its original scope.
 The contact trial reports allowlisted native Odoo XML-RPC validation labels
 directly. A company-classification blocker requires mapping review; pulling a
 diagnostic fix does not change the record or bypass that guard.
+
+For source companies with no Tax ID, explicit --preserve-legacy-classification
+on plan preserves the old Company/Individual flag through protected imported
+provenance. Ordinary contacts keep native Odoo rules; VAT is not fabricated.
+Review the policy-bound plan before apply. This requires the 20.0.3.0.0 addon
+schema upgrade in the runbook before restarting Odoo 20. Child contacts remain
+outside this trial.

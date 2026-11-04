@@ -119,6 +119,8 @@ class TrialRPC(ReadOnlyRPC):
         "trial_history_restore_requires_review", "trial_source_history_changed_requires_review", "trial_source_history_removed_requires_review",
         "trial_attachment_bytes_changed", "trial_message_readback_failed", "trial_contact_readback_failed",
         "trial_country_requires_unique_mapping", "trial_company_classification_requires_mapping",
+        "invalid_trial_classification_policy", "trial_classification_policy_requires_review",
+        "trial_target_parent_requires_review",
     }
 
     def failure_code(self, exc):
@@ -155,6 +157,7 @@ class Target:
             raise PilotError("unsupported_target_trial_protocol_or_database")
         if info.get("can_apply") is not True:
             raise PilotError("assign_contact_trial_migrator_role")
+        self.can_preserve_classification = info.get("preserve_legacy_classification") is True
 
     def call(self, method, *args):
         if method not in TrialRPC.OPERATIONS:
@@ -166,15 +169,19 @@ class Target:
         return result
 
 
-def execute_contact(source, target, journal, contact_id, apply=False, approved_digest=None):
+def execute_contact(source, target, journal, contact_id, apply=False, approved_digest=None, preserve_legacy_classification=False):
     namespace = contract.namespace(contact_id)
     with journal.lock(namespace):
         run = journal.start(namespace, "apply" if apply else "dry_run", contract.SOURCE, contract.TARGET, contract.VERSION)
         target_id = None
         payload_digest = None
         try:
+            if type(preserve_legacy_classification) is not bool:
+                raise PilotError("invalid_trial_classification_policy")
+            if preserve_legacy_classification and not target.can_preserve_classification:
+                raise PilotError("upgrade_tracking_addon_for_classification_preservation")
             data = source.extract(contact_id)
-            payload_digest = contract.digest(data)
+            payload_digest = contract.review_digest(data, preserve_legacy_classification)
             if apply and approved_digest != payload_digest:
                 raise PilotError("source_changed_regenerate_trial_plan")
             mapping = journal.mapping(namespace)
@@ -184,24 +191,26 @@ def execute_contact(source, target, journal, contact_id, apply=False, approved_d
             expected_items = journal.connection.execute(
                 "SELECT kind,source_id,target_id,payload_digest AS digest FROM bambus_pilot.history_items WHERE namespace=%s ORDER BY kind,source_id",
                 (namespace,)).fetchall()
-            preview = target.call("bambus_trial_preview", data, expected, expected_items)
+            policy_arg = [True] if preserve_legacy_classification else []
+            preview = target.call("bambus_trial_preview", data, expected, expected_items, *policy_arg)
             target_id = preview["target_id"] or None
             if not target_id and journal.has_intent(namespace, "load_intent", "create"):
                 raise PilotError("unresolved_target_create_requires_review")
             counts = {k: preview[k] for k in ("messages", "attachments", "tracking_changes")}
             journal.event(run, "validated", source_id=contact_id, target_id=target_id,
-                          fields=list(contract.FIELDS), operation=preview["operation"], **counts)
+                          fields=[*contract.FIELDS, *(["bambus_legacy_classification"] if preserve_legacy_classification else [])],
+                          operation=preview["operation"], **counts)
             if not apply:
                 journal.finish(run, "dry_run", contact_id, target_id, payload_digest)
                 return {"source_id": contact_id, "digest": payload_digest, "expected_target": target_id,
                         "operation": preview["operation"], **counts}
             journal.event(run, "load_intent", operation=preview["operation"], target_id=target_id)
-            result = target.call("bambus_trial_apply", data, expected, expected_items)
+            result = target.call("bambus_trial_apply", data, expected, expected_items, *policy_arg)
             if result.get("state") != "reconciled" or type(result.get("target_id")) is not int:
                 raise PilotError("trial_apply_not_reconciled")
             target_id = result["target_id"]
             # A second RPC verifies committed receipts and current target state.
-            verified = target.call("bambus_trial_preview", data, target_id, expected_items)
+            verified = target.call("bambus_trial_preview", data, target_id, expected_items, *policy_arg)
             if verified.get("operation") != "no_change" or any(verified[k] != counts[k] for k in counts):
                 raise PilotError("trial_committed_readback_failed")
             with journal.connection.transaction():
@@ -225,7 +234,8 @@ def execute_contact(source, target, journal, contact_id, apply=False, approved_d
 
 
 def validate_plan(plan):
-    if not isinstance(plan, dict) or set(plan) != {"version", "contacts"} or plan["version"] != contract.VERSION:
+    if (not isinstance(plan, dict) or set(plan) not in ({"version", "contacts"}, {"version", "contacts", "preserve_legacy_classification"})
+            or plan["version"] != contract.VERSION or type(plan.get("preserve_legacy_classification", False)) is not bool):
         raise PilotError("invalid_contact_trial_plan")
     rows = plan["contacts"]
     if not isinstance(rows, list) or not 1 <= len(rows) <= 5:
@@ -253,10 +263,12 @@ def main(argv=None):
     parser.add_argument("--output", type=Path)
     parser.add_argument("--plan", type=Path)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--preserve-legacy-classification", action="store_true",
+                        help="Plan only: explicitly preserve source Company/Individual classification on imported contacts")
     args = parser.parse_args(argv)
     if args.action == "plan" and (not args.contact_ids or not args.output or args.plan or args.apply):
         parser.error("plan requires --contact-ids and --output only")
-    if args.action == "apply" and (not args.plan or not args.apply or args.contact_ids or args.output):
+    if args.action == "apply" and (not args.plan or not args.apply or args.contact_ids or args.output or args.preserve_legacy_classification):
         parser.error("apply requires --plan and explicit --apply only")
     journal = None
     try:
@@ -266,10 +278,13 @@ def main(argv=None):
             if args.output.exists():
                 raise PilotError("use_new_plan_output_path")
             rows = [{"source_id": n} for n in args.contact_ids]
+            preserve = args.preserve_legacy_classification
         else:
             if args.plan.stat().st_size > 16384:
                 raise PilotError("trial_plan_too_large")
-            rows = validate_plan(json.loads(args.plan.read_text()))
+            plan = json.loads(args.plan.read_text())
+            rows = validate_plan(plan)
+            preserve = plan.get("preserve_legacy_classification", False)
         src, dst = Settings.from_environment("ODOO12"), Settings.from_environment("ODOO20")
         identity(src, 8012, "odoo12_demo")
         identity(dst, 8020, "odoo20_migration")
@@ -283,15 +298,15 @@ def main(argv=None):
             mapping = journal.mapping(contract.namespace(row["source_id"]))
             if args.apply and row["expected_target"] is not None and (not mapping or mapping["target_id"] != row["expected_target"]):
                 raise PilotError("trial_plan_target_mapping_changed")
-            results.append(execute_contact(source, target, journal, row["source_id"], args.apply, row.get("digest")))
+            results.append(execute_contact(source, target, journal, row["source_id"], args.apply, row.get("digest"), preserve))
         if args.action == "plan":
-            plan = {"version": contract.VERSION, "contacts": results}
+            plan = {"version": contract.VERSION, "contacts": results, "preserve_legacy_classification": preserve}
             validate_plan(plan)
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with open(args.output, "x", opener=lambda path, flags: os.open(path, flags, 0o600)) as output:
                 json.dump(plan, output, indent=2)
         print(json.dumps({"state": "reconciled" if args.apply else "preview", "contact_fields": list(contract.FIELDS),
-                          "contacts": results}, indent=2))
+                          "classification_policy": "preserve_source" if preserve else "native", "contacts": results}, indent=2))
         return 0
     except (PilotError, ProbeFailure) as exc:
         print(json.dumps({"state": "blocked", "error": str(exc)}))

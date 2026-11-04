@@ -41,3 +41,10 @@
   automatic merge, conflict correction and full restore recovery remain unbuilt.
   Source collection spans RPC reads, not one database snapshot: pause changes
   to selected trial records. The actual user-local source still needs acceptance.
+
+- Explicit source classification preservation can retain a company without a
+  Tax ID through protected imported provenance and scoped computed behavior.
+  Default native mode still blocks mismatch. This policy is not a VAT/fiscal
+  validation bypass, broader localization certification or child-contact mapping.
+  New partner metadata requires the documented addon schema upgrade before
+  application restart. Existing mapped targets moved under a parent block review.

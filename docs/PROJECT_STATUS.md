@@ -1,11 +1,19 @@
 # Project status
 
 Latest update: 2026-11-04 (Asia/Kolkata). Branch: development.
-Base for contact-history increment: 41a8855. Use git log -1 --format=%H for the latest commit.
+Base for classification preservation increment: 935c53e. Use git log -1 --format=%H for the latest commit.
 Main and private local review branches are unchanged; never push those archives.
 
 ## Implemented
 
+- Explicit --preserve-legacy-classification preview policy, bound into the
+  reviewed plan digest. Imported company/person type is stored as protected
+  provenance and drives a scoped compute extension; native contacts retain
+  their ordinary rules. Company without Tax ID is supported without fabrication
+  or source edits. The default native mismatch guard remains active.
+- Protected type cannot be injected through ordinary ORM/RPC values or defaults.
+  Readonly Imported contact type appears separately from Tax ID on the form.
+  Mapped targets moved under another parent block for review; no automatic unlink.
 - Native bare UserError XML-RPC fault labels are recognized by the host worker,
   including the company-classification blocker. Unknown/payload-bearing faults
   remain generic. This fixes diagnostics only; classification mapping remains
@@ -16,8 +24,8 @@ Main and private local review branches are unchanged; never push those archives.
   are preserved as readable internal history, not impersonated users/native
   tracking rows. Separate Contact Trial Migrator role; normal business ACLs.
 - Scoped contact/Tax ID mapping and country lookup by ISO code. Native company
-  classification must agree with source; unsupported classifications block
-  preview instead of forcing readonly fields or inventing tax data.
+  classification must agree with source in default mode; explicit preservation
+  uses guarded source provenance instead of writing readonly flags/fake tax data.
 - Synthetic contact pilot with explicit create/update, native-default validation,
   marker-based idempotence, journal intents/history, locking and reconciliation.
   User-local create/rerun/update results have been supplied successfully; actual
@@ -37,11 +45,11 @@ Main and private local review branches are unchanged; never push those archives.
 
 ## Executed validation
 
-- 88 standard unit/protocol tests passed, 0 failures/errors/skips (4.777s),
-  including real XML-RPC fault serialization/decoding of bare native UserErrors.
+- 89 standard unit/protocol tests passed, 0 failures/errors/skips (5.292s),
+  including policy-bound digests, native-plan compatibility and safe fault decoding.
 - 16 PostgreSQL/HTTP pilot integration tests passed (14.525s), including READ ONLY
   monitor export and preservation of stable identity on repeat initialization.
-- 40 native Odoo addon tests passed on official Odoo 20 (20.0-20261102), 0 failed
+- 46 native Odoo addon upgrade tests passed on official Odoo 20 (20.0-20261102), 0 failed
   or errors. Roles, context forgery/direct writes, idempotence, stale/partial/empty
   snapshots, evidence validation and marker-checked navigation were exercised.
 - Contact-history tests additionally verify original dates/labels/content/file
@@ -60,6 +68,10 @@ Main and private local review branches are unchanged; never push those archives.
   recovery/rerun, source digest rejection, reviewed update, independent message/
   file mappings and journal UI transfer passed. Chromium opened that contact
   from tracking and verified its historical note, author label and attachment.
+- An actual 20.0.2.0.0-to-20.0.3.0.0 upgrade preserved an existing native-mode
+  contact, historical message/file IDs and receipt fingerprints. Current full
+  worker/browser tests additionally verified opt-in company classification with
+  an empty Tax ID, normal defaults/ACLs, target-parent drift and safe reruns.
 - Both Compose configurations validated with non-secret placeholders; pip check
   passed. Test containers/network/tmpfs were cleaned by their owner; no existing
   lab resource or named test volume was used.
@@ -78,8 +90,8 @@ existing PostgreSQL lab passwords, recreate only the Odoo 20 application to moun
 addons, install through Apps, assign the worker account Journal Importer, repeat
 non-destructive journal init, then run monitor. Verify actual history/counts and
 Viewer permissions locally. No image rebuild or database reset is required.
-For the new trial, follow docs/contact-history-trial.md: pull, restart only
-Odoo 20, install/upgrade the addon, assign Contact Trial Migrator to a worker with
+For the new trial, follow docs/contact-history-trial.md: pull, upgrade the addon
+schema before restarting only Odoo 20, assign Contact Trial Migrator to a worker with
 native contact permissions, initialize the additive journal table, select a
 previously unmigrated contact, review its plan and apply. Actual Odoo 12 source
 compatibility/chatter preservation still need acceptance on the user's lab.
@@ -105,6 +117,8 @@ The selected-contact trial preserves bounded binary files/readable chatter only;
 general binary migration, rich HTML, native tracking/thread relationships,
 activities/followers, custom logs, ranks/accounting and full contact mappings are
 not implemented. Native Odoo 20 computes is_company from tax/commercial data;
-legacy classifications that cannot be represented remain blocked for mapping
-review. Source collection spans RPC reads, so pause selected-record edits during
+legacy classifications that disagree block in default mode. Reviewed source
+preservation applies only to opted-in imported contacts, not other contacts or
+general fiscal/accounting behavior. Custom/localization compatibility and full
+client source acceptance remain pending. Source collection spans RPC reads, so pause selected-record edits during
 the trial. Target restores require review rather than automatic recreation.

@@ -25,6 +25,11 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def review_digest(data, preserve_legacy_classification=False):
+    require(type(preserve_legacy_classification) is bool)
+    return digest({"data": data, "classification_policy": "preserve_source"}) if preserve_legacy_classification else digest(data)
+
+
 def namespace(source_id):
     return digest([SOURCE, TARGET, VERSION, source_id])
 

@@ -1,5 +1,10 @@
 # Bambus Migration Control — local installation and operation
 
+For an existing installation upgrading to 20.0.3.0.0, first follow the schema
+upgrade steps in [the contact-history runbook](contact-history-trial.md). Upgrade
+the stored partner field before restarting the application; retain all volumes
+and the working container's database credentials.
+
 This Odoo 20 Community addon displays journal-backed tracking. Its overview,
 records, execution attempts, timelines, issues and last reconciled mappings are
 read-only. PostgreSQL remains authoritative outside Odoo. The app does not store

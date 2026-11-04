@@ -12,6 +12,7 @@ from .monitor import _IMPORT_TOKEN
 
 QUIET = {"tracking_disable": True, "mail_create_nosubscribe": True, "mail_create_nolog": True,
          "mail_notify_force_send": False, "mail_notrack": True}
+_CLASSIFICATION_TOKEN = object()
 
 
 class ContactReceipt(models.Model):
@@ -31,11 +32,45 @@ class ContactReceipt(models.Model):
 class ContactTrial(models.Model):
     _inherit = "res.partner"
 
+    bambus_legacy_classification = fields.Selection(
+        [("native", "Native Odoo classification"), ("company", "Imported company"), ("person", "Imported individual")],
+        string="Imported contact type", default="native", required=True, readonly=True, copy=False,
+        help="An explicitly reviewed source classification for imported lab contacts only.")
+
+    @api.depends("has_vat", "commercial_partner_id", "bambus_legacy_classification")
+    def _compute_is_company(self):
+        super()._compute_is_company()
+        for partner in self:
+            if partner.bambus_legacy_classification in {"company", "person"}:
+                partner.is_company = partner.bambus_legacy_classification == "company"
+
+    def _bambus_check_classification_write(self, values, creating=False):
+        # Delegated res.users creation forwards the ordinary native default.
+        # This does not authorize importing a source type or resetting one.
+        if creating and values.get("bambus_legacy_classification") == "native":
+            return
+        if "bambus_legacy_classification" in values and self.env.context.get("_bambus_classification_token") is not _CLASSIFICATION_TOKEN:
+            raise AccessError("Imported classification can only be set by the reviewed contact trial.")
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        vals_list = [dict(values) for values in vals_list]
+        for values in vals_list:
+            self._bambus_check_classification_write(values, creating=True)
+            if self.env.context.get("_bambus_classification_token") is not _CLASSIFICATION_TOKEN:
+                # Do not let RPC context/ir.default inject imported provenance.
+                values["bambus_legacy_classification"] = "native"
+        return super().create(vals_list)
+
+    def write(self, values):
+        self._bambus_check_classification_write(values)
+        return super().write(values)
+
     @api.model
     def bambus_trial_info(self):
         return {"version": contract.VERSION,
                 "can_apply": self.env.user.has_group("bambus_migration_control.group_contact_trial"),
-                "lab_database": self.env.cr.dbname == "odoo20_migration"}
+                "lab_database": self.env.cr.dbname == "odoo20_migration", "preserve_legacy_classification": True}
 
     def _bambus_gate(self, data):
         if (self.env.cr.dbname != "odoo20_migration" or not
@@ -53,8 +88,11 @@ class ContactTrial(models.Model):
 
     def _bambus_fingerprint(self, kind, record):
         if kind == "contact":
-            return contract.digest({key: record[key] if key in {"is_company", "active"} else record[key] or ""
-                                    for key in contract.FIELDS} | {"ref": record.ref})
+            values = {key: record[key] if key in {"is_company", "active"} else record[key] or "" for key in contract.FIELDS} | {"ref": record.ref}
+            # Preserve fingerprints of existing native-mode v1 receipts.
+            if record.bambus_legacy_classification != "native":
+                values["bambus_legacy_classification"] = record.bambus_legacy_classification
+            return contract.digest(values)
         if kind == "attachment":
             return contract.digest({"name": record.name, "data": base64.b64encode(bytes(record.raw)).decode(),
                                     "model": record.res_model, "res_id": record.res_id, "public": record.public,
@@ -75,25 +113,31 @@ class ContactTrial(models.Model):
             raise UserError("trial_target_missing_or_modified_requires_review")
         return receipt, record
 
-    def _bambus_values(self, data):
+    def _bambus_values(self, data, preserve_legacy_classification=False):
+        if type(preserve_legacy_classification) is not bool:
+            raise UserError("invalid_trial_classification_policy")
         values = {k: v for k, v in data["values"].items() if k not in {"is_company", "country_code"}}
         country_code = data["values"]["country_code"]
         countries = self.env["res.country"].search([("code", "=", country_code)], limit=2) if country_code else self.env["res.country"]
         if country_code and len(countries) != 1:
             raise UserError("trial_country_requires_unique_mapping")
         values["country_id"] = countries.id if countries else False
-        # The tested Odoo 20 computes is_company from its commercial entity and
-        # VAT. Do not force a readonly field or fabricate a VAT to match v12.
+        values["parent_id"] = False
+        values["bambus_legacy_classification"] = ("company" if data["values"]["is_company"] else "person") if preserve_legacy_classification else "native"
+        # A normal compute extension, backed by guarded source provenance; never
+        # write is_company itself or fabricate a VAT to match the old version.
         prospective = self.new(values)
         prospective._compute_is_company()
         if bool(prospective.is_company) != data["values"]["is_company"]:
             raise UserError("trial_company_classification_requires_mapping")
         return values
 
-    def _bambus_preview(self, data, expected_target, expected_items=None):
+    def _bambus_preview(self, data, expected_target, expected_items=None, preserve_legacy_classification=False):
         namespace, receipts = self._bambus_gate(data)
-        self._bambus_values(data)
+        self._bambus_values(data, preserve_legacy_classification)
         receipt, contact = self._bambus_existing(receipts, namespace, "contact", data["source_id"])
+        if contact and contact.parent_id:
+            raise UserError("trial_target_parent_requires_review")
         marker = "bambus-pilot-target:" + namespace
         marked = self.with_context(active_test=False).search([("ref", "=", marker)])
         if (contact and marked != contact) or (not contact and marked):
@@ -131,14 +175,19 @@ class ContactTrial(models.Model):
             raise UserError("trial_source_history_removed_requires_review")
         if contact:
             changed |= receipt.source_digest != contract.digest(data["values"])
+            desired = ("company" if data["values"]["is_company"] else "person") if preserve_legacy_classification else "native"
+            if not preserve_legacy_classification and contact.bambus_legacy_classification != "native":
+                raise UserError("trial_classification_policy_requires_review")
+            changed |= contact.bambus_legacy_classification != desired
         return {"operation": "create" if not contact else "update" if changed else "no_change",
                 "target_id": contact.id if contact else False, "items": items,
                 "messages": len(data["messages"]), "attachments": len(data["attachments"]),
-                "tracking_changes": sum(len(m["changes"]) for m in data["messages"])}
+                "tracking_changes": sum(len(m["changes"]) for m in data["messages"]),
+                "classification_policy": "preserve_source" if preserve_legacy_classification else "native"}
 
     @api.model
-    def bambus_trial_preview(self, data, expected_target=None, expected_items=None):
-        return self._bambus_preview(data, expected_target, expected_items)
+    def bambus_trial_preview(self, data, expected_target=None, expected_items=None, preserve_legacy_classification=False):
+        return self._bambus_preview(data, expected_target, expected_items, preserve_legacy_classification)
 
     def _bambus_body(self, message):
         # Preserve readable content safely; do not carry active source image URLs,
@@ -153,18 +202,18 @@ class ContactTrial(models.Model):
         return Markup(body)
 
     @api.model
-    def bambus_trial_apply(self, data, expected_target=None, expected_items=None):
+    def bambus_trial_apply(self, data, expected_target=None, expected_items=None, preserve_legacy_classification=False):
         # One RPC transaction per contact: a failure rolls back contact, all
         # historical messages/attachments and receipts together.
-        result = self._bambus_preview(data, expected_target, expected_items)
+        result = self._bambus_preview(data, expected_target, expected_items, preserve_legacy_classification)
         namespace, receipts = self._bambus_gate(data)
-        quiet = self.with_context(**QUIET)
+        quiet = self.with_context(**QUIET, _bambus_classification_token=_CLASSIFICATION_TOKEN)
         if result["target_id"]:
             contact = quiet.browse(result["target_id"])
             if result["operation"] != "no_change":
-                contact.write(self._bambus_values(data))
+                contact.write(self._bambus_values(data, preserve_legacy_classification))
         else:
-            contact = quiet.create({**self._bambus_values(data), "ref": "bambus-pilot-target:" + namespace})
+            contact = quiet.create({**self._bambus_values(data, preserve_legacy_classification), "ref": "bambus-pilot-target:" + namespace})
 
         def remember(kind, source_id, record, source_digest):
             values = {"namespace": namespace, "kind": kind, "source_id": source_id, "target_id": record.id,
@@ -212,5 +261,5 @@ class ContactTrial(models.Model):
         if actual != data["values"]:
             raise UserError("trial_contact_readback_failed")
         remember("contact", data["source_id"], contact, contract.digest(data["values"]))
-        verified = self._bambus_preview(data, contact.id)
+        verified = self._bambus_preview(data, contact.id, preserve_legacy_classification=preserve_legacy_classification)
         return {**verified, "state": "reconciled", "operation": result["operation"]}

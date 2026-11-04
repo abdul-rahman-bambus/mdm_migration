@@ -12,6 +12,7 @@ class HistoryFixture:
     def __enter__(self):
         self.calls = []
         self.phone = "+12025550100"
+        self.is_company = False
         fixture = self
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *args):
@@ -29,7 +30,7 @@ class HistoryFixture:
                     assert operation == "search_read"
                     rows = {
                         "res.partner": [{"id": 41, "name": "Synthetic chatter contact", "email": "history@example.invalid",
-                                         "phone": fixture.phone, "is_company": False, "active": True, "parent_id": False, "country_id": False, "vat": ""}],
+                                         "phone": fixture.phone, "is_company": fixture.is_company, "active": True, "parent_id": False, "country_id": False, "vat": ""}],
                         "res.users": [],
                         "mail.message": [{"id": 101, "date": "2019-10-01 09:30:00", "author_id": [7, "Synthetic author"],
                                           "subject": "History", "body": "<p>Synthetic historical note</p>", "message_type": "comment", "subtype_id": [2, "Note"], "email_from": False,

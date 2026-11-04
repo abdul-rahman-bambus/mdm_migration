@@ -133,7 +133,7 @@ one authoritative journal for locking/idempotence. Mark success only after
 read-back reconciliation. Block source/target identity conflicts and target
 restore/missing-mapping situations for review; do not auto-delete/recreate them.
 
-Standard tests: python -m unittest discover -s tests -v (88 tests at this update).
+Standard tests: python -m unittest discover -s tests -v (89 tests at this update).
 Optional integration: python scripts/run_pilot_integration.py (16 tests), after
 installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
 container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
@@ -180,7 +180,7 @@ arbitrary commands from web requests. Do not put journal passwords in Odoo.
 Native addon/browser validation: python scripts/run_control_integration.py,
 after requirements-control-test.txt, Docker and Chromium. It owns disposable
 Odoo/PostgreSQL containers/network/tmpfs only and never touches existing lab
-services/volumes. Current results: 40 native Odoo tests plus browser smoke passed.
+services/volumes. Current results: 46 native Odoo upgrade tests plus browser smoke passed.
 Keep redacted test logs/screenshots under ignored reports/, not in Git.
 
 ## Contact-history trial rules
@@ -191,7 +191,10 @@ the original synthetic-only worker. Accept 1–5 explicit top-level contact IDs,
 preview and reviewed source digest before --apply. Keep source read-only. Fields
 are name/email/phone/active/Tax ID, country by ISO code and checked is_company;
 document omitted mappings. Never force readonly company classification or invent
-VAT values; target/source classification disagreement blocks preview. Exclude
+VAT values; default native mode blocks classification disagreement. An explicit
+--preserve-legacy-classification plan can retain source type through guarded
+provenance and a compute extension on imported contacts only. Bind that policy
+to the reviewed digest; never opt in automatically. Exclude
 user-account contacts/children; block unsupported or inaccessible history.
 
 The addon execution API requires Contact Trial Migrator and odoo20_migration,
@@ -210,3 +213,13 @@ monitor metadata. See docs/contact-history-trial.md for limits and acceptance.
 Recognize only allowlisted UserError codes across bare/native and traceback RPC
 formats. Unknown fault text stays private. Diagnostic improvements must not
 silently bypass classification or other migration guards.
+Preserve native-mode receipt fingerprints and namespace identities when adding
+optional classification policies. Do not reset imported provenance through
+normal ORM/RPC writes; allow the ordinary native default during delegated user
+creation. Upgrade the added partner column before restarting a source-based
+application; preserve the working container's credentials and all volumes.
+Ignore context/ir.default attempts to inject imported provenance on ordinary
+creates; default-mode previews must likewise use the explicit native policy.
+Top-level targets moved under another parent require review, not automatic
+unlinking or shared-parent updates. The integration runner also needs public
+commit 935c53e in local Git history for its previous-addon upgrade fixture.

@@ -9,8 +9,8 @@ This is not the client's custom MDM migration or a full customer/vendor mapping.
 
 - Contact fields: name, email, phone, active and VAT/Tax ID. Country maps by ISO
   code, never by copying its source database ID. The original is_company flag
-  must agree with Odoo 20's computed classification; it is verified rather than
-  forced into a readonly field. Other fields, including addresses, original ref,
+  must agree with Odoo 20's computed classification in the default native mode.
+  An explicit preservation mode is described below. Other fields, including addresses, original ref,
   ranks, tags, images and parent links, are not mapped. A dedicated ref marks the
   imported contact.
 - Contact chatter from mail.message: original subject/date, original author
@@ -38,8 +38,8 @@ binary data, 500 tracking rows in source collection and 50 changes per message.
 The read client also enforces bounded XML-RPC responses. Exceeding a limit,
 inaccessible linked data or an unsupported message/attachment/tracking type
 blocks the contact; it is never silently truncated. URL attachments are blocked.
-User-account contacts and child contacts are excluded. Companies are supported
-when native target classification agrees. In the tested Odoo 20 build, a
+User-account contacts and child contacts are excluded. In default mode, companies
+are supported when native target classification agrees. In the tested Odoo 20 build, a
 top-level contact is classified from its tax data. A legacy company without a
 usable Tax ID, or an individual classified differently by target rules, blocks
 preview with trial_company_classification_requires_mapping. Do not invent a VAT,
@@ -54,6 +54,29 @@ faults. This diagnostic fix does not resolve or bypass the classification
 disagreement. Check whether the source is a company/person and whether its Tax
 ID is empty or a placeholder; do not alter genuine source data to pass a trial.
 
+## Explicit source classification preservation
+
+For legitimate source companies without a Tax ID, plan with
+--preserve-legacy-classification. This preserves the source Company/Individual
+flag using protected provenance on the imported contact. The addon extends the
+native computed classification for these opted-in records only; ordinary Odoo
+contacts keep the native tax-based rule. It never writes is_company directly,
+invents a Tax ID, changes source records or changes ordinary contacts' type.
+
+The contact form shows **Imported contact type**. Only the guarded migration API
+can set/change that provenance; normal write/create or forged RPC contexts cannot
+set an imported type or clear it on existing contacts. Native VAT validation
+still applies. This preserves business classification, not a claim that a Tax ID
+exists or that tax/accounting workflows have been validated.
+
+The policy is printed and saved in the plan and bound into its reviewed digest.
+Apply uses the saved policy; flipping it in a plan without a fresh preview
+blocks. Default native mode retains the original mismatch guard. Existing native
+plans/receipts retain their identities and fingerprints. A reviewed opt-in can
+update an existing mapped contact in place; dropping preservation afterward
+requires review instead of silently changing its type. Source type/Tax ID changes
+also require a new preview. This does not add parent/child contact support.
+
 ## Upgrade and roles
 
 Use development and the existing activated virtual environment. Restore the
@@ -65,15 +88,31 @@ git pull --ff-only origin development
 source .venv/bin/activate
 ```
 
-The addon now depends on native mail. Restart only the existing Odoo 20
-application so its Python code is reloaded:
+Version 20.0.3.0.0 adds a stored provenance field on res.partner. For the existing
+source-based Docker lab, upgrade its database schema with a separate Python
+process before restarting the application. Keep the Odoo 20 container running,
+pause the monitor and avoid using its UI while this command runs:
+
+```bash
+docker exec odoo_migration_lab-odoo20-1 \
+  /opt/venv/bin/python /opt/odoo/odoo-bin \
+  --config=/dev/null --db_host=pg20 --db_user=odoo \
+  --database=odoo20_migration \
+  --addons-path=/opt/odoo/odoo/addons,/opt/odoo/addons,/mnt/bambus-addons \
+  --data-dir=/var/lib/odoo --update=bambus_migration_control \
+  --stop-after-init --no-http
+```
+
+This inherits the working container's PGPASSWORD without printing it or changing
+PostgreSQL credentials. For a first installation use --init instead of --update.
+Once the upgrade completes successfully, restart only the Odoo 20 application:
 
 ```bash
 docker restart odoo_migration_lab-odoo20-1
 ```
 
-After Odoo has started, enable developer mode, update the Apps list, then
-**upgrade Bambus Migration Control** (install it if not already installed).
+Do not restart into a failed schema upgrade; retain its error for diagnosis.
+The other Odoo/PostgreSQL/journal containers and volumes are not recreated.
 Assign the ODOO20_USERNAME worker account **Contact Trial Migrator**, under
 Migration Operations / Migration Control. This role includes Journal Importer
 and Viewer. The Journal Importer role alone cannot migrate contacts. Business
@@ -115,6 +154,22 @@ python -m migration_lab.contact_history plan --lab-only \
 For a later small batch, supply up to five explicit IDs after --contact-ids.
 Do not run the old synthetic worker and this trial against the same contact:
 cross-version/global entity deduplication is not implemented.
+
+For a company whose source type needs preservation, use a fresh plan filename:
+
+```bash
+python -m migration_lab.contact_history plan --lab-only \
+  --contact-ids "$CONTACT_TRIAL_ID" --preserve-legacy-classification \
+  --output reports/contact-company-plan-1.json
+```
+
+Review classification_policy: preserve_source alongside the counts and proposed
+operation. Then apply that exact plan (the flag is not supplied again on apply):
+
+```bash
+python -m migration_lab.contact_history apply --lab-only \
+  --plan reports/contact-company-plan-1.json --apply
+```
 
 The target preview checks protected identity receipts and current imported
 records but writes no target data. The independent journal records each preview.

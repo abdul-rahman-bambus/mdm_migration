@@ -5,12 +5,14 @@ Needs Docker, Chromium and requirements-control-test.txt. Artifacts are ignored.
 """
 
 import json
+import io
 import os
 from pathlib import Path
 import re
 import secrets
 import subprocess
 import sys
+import tarfile
 import time
 import urllib.request
 
@@ -39,6 +41,21 @@ def main():
     suffix = secrets.token_hex(6)
     network, pg, app = [f"bambus-control-{name}-{suffix}" for name in ("net", "pg", "app")]
     journal = None
+    # A pinned public predecessor tests a real stored-field upgrade rather than
+    # assuming that fresh installation proves existing receipts remain valid.
+    previous = output / ("previous-addon-" + suffix)
+    archive = subprocess.run(["git", "archive", "935c53e", "addons/bambus_migration_control"],
+                             cwd=root, capture_output=True)
+    if archive.returncode:
+        raise RuntimeError("Upgrade validation needs public commit 935c53e in the local Git history")
+    previous.mkdir()
+    with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as source_archive:
+        source_archive.extractall(previous, filter="data")
+    # data-filtered archive directories inherit the host's restrictive umask;
+    # this pinned public source must be readable by Odoo's container user.
+    previous.chmod(0o755)
+    for entry in previous.rglob("*"):
+        entry.chmod(0o755 if entry.is_dir() else 0o644)
 
     def redact(value):
         return value.replace(password, "[redacted]").replace(admin_password, "[redacted]")
@@ -79,17 +96,45 @@ def main():
         docker("run", "--detach", "--name", app, "--network", network, "--memory=2g",
                "--publish", "127.0.0.1::8069", "--tmpfs", "/var/lib/odoo:rw,size=256m,mode=1777",
                "--mount", f"type=bind,src={root / 'addons'},dst=/mnt/extra-addons,readonly",
+               "--mount", f"type=bind,src={previous / 'addons'},dst=/mnt/previous-addons,readonly",
                "--env", "PGPASSWORD", "--env", "MONITOR_TEST_PASSWORD", "--entrypoint", "sleep", ODOO_IMAGE, "infinity")
         odoo = ["odoo", "--config=/dev/null", "--db_host=" + pg, "--db_user=bambus_journal",
                 "--database=odoo20_migration", "--addons-path=/mnt/extra-addons", "--data-dir=/var/lib/odoo"]
-        print("Installing addon and running native Odoo model/view/security tests...", flush=True)
-        docker("exec", app, *odoo, "--init=bambus_migration_control", "--without-demo=all",
+        old_odoo = [arg.replace("--addons-path=/mnt/extra-addons", "--addons-path=/mnt/previous-addons") for arg in odoo]
+        print("Installing previous addon and preserving a real native-mode history receipt...", flush=True)
+        docker("exec", app, *old_odoo, "--init=bambus_migration_control", "--without-demo=all", "--stop-after-init", "--no-http", log="previous-install.log")
+        legacy_shell = """import json
+admin = env.ref('base.user_admin')
+admin.write({'group_ids': [(4, env.ref('bambus_migration_control.group_contact_trial').id)]})
+data = {'version': 'contact-history-v1', 'source_id': 900001,
+        'values': {'name': 'Synthetic pre-upgrade contact', 'email': 'pre-upgrade@example.invalid', 'phone': '+12025550150', 'is_company': False, 'active': True, 'vat': '', 'country_code': ''},
+        'messages': [{'id': 800001, 'date': '2019-10-01 09:30:00', 'author': 'Synthetic historical author', 'subject': 'Before upgrade', 'body': '<p>Existing history</p>', 'kind': 'comment', 'subtype': 'Note', 'changes': [], 'attachments': [700001]}],
+        'attachments': [{'id': 700001, 'name': 'pre-upgrade.txt', 'data': 'dHJpYWw='}]}
+result = env['res.partner'].with_user(admin).bambus_trial_apply(data)
+with open('/var/lib/odoo/legacy-trial.json', 'w') as output:
+    json.dump({'data': data, 'result': result}, output)
+env.cr.commit()
+"""
+        docker("exec", "--interactive", app, "odoo", "shell", *old_odoo[1:], "--no-http", input=legacy_shell, log="previous-bootstrap.log")
+        print("Upgrading stored fields and running native Odoo model/view/security tests...", flush=True)
+        docker("exec", app, *odoo, "--update=bambus_migration_control", "--without-demo=all",
                      "--test-enable", "--test-tags=/bambus_migration_control", "--stop-after-init", "--no-http", log="odoo-install.log")
         # docker returns stdout; Odoo uses stderr. Inspect the redacted combined
         # log and require a positive, successful current-run test count.
         summaries = re.findall(r"(\d+) failed, (\d+) error\(s\) of (\d+) tests", (output / "odoo-install.log").read_text())
         assert summaries and int(summaries[-1][2]) >= 14 and summaries[-1][:2] == ("0", "0"), "Native addon tests did not pass; inspect the current install log"
         print("Native addon tests:", summaries[-1], flush=True)
+        upgrade_check = """import json
+with open('/var/lib/odoo/legacy-trial.json') as source:
+    legacy = json.load(source)
+admin = env.ref('base.user_admin')
+partner = env['res.partner'].browse(legacy['result']['target_id'])
+assert partner.bambus_legacy_classification == 'native' and not partner.is_company
+result = env['res.partner'].with_user(admin).bambus_trial_preview(legacy['data'], partner.id, legacy['result']['items'])
+assert result['operation'] == 'no_change' and result['items'] == legacy['result']['items']
+"""
+        docker("exec", "--interactive", app, "odoo", "shell", *odoo[1:], "--no-http", input=upgrade_check, log="upgrade-check.log")
+        print("Previous contact, history/file identities and receipt fingerprints survived the addon upgrade.", flush=True)
         shell = """import os
 admin = env.ref('base.user_admin')
 admin.with_context(no_reset_password=True).write({'password': os.environ['MONITOR_TEST_PASSWORD'], 'group_ids': [(4, env.ref('bambus_migration_control.group_migration_importer').id)]})
@@ -190,7 +235,13 @@ env.cr.commit()
                input="env.ref('base.user_admin').write({'group_ids': [(4, env.ref('bambus_migration_control.group_contact_trial').id)]})\nenv.cr.commit()\n", log="history-bootstrap.log")
         history_target = Target(settings)
         with HistoryFixture() as fixture:
-            preview = execute_contact(fixture.source, history_target, journal, 41)
+            fixture.is_company = True
+            try:
+                execute_contact(fixture.source, history_target, journal, 41)
+                raise AssertionError("Native company classification disagreement must remain blocked")
+            except Exception as exc:
+                assert str(exc) == "trial_company_classification_requires_mapping", str(exc)
+            preview = execute_contact(fixture.source, history_target, journal, 41, preserve_legacy_classification=True)
             assert (preview["messages"], preview["attachments"], preview["tracking_changes"]) == (1, 1, 1)
             original_call = history_target.call
 
@@ -202,24 +253,24 @@ env.cr.commit()
 
             history_target.call = lost_history_ack
             try:
-                execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"])
+                execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"], True)
                 raise AssertionError("Lost contact-history acknowledgement must fail the journal attempt")
             except Exception as exc:
                 assert str(exc) == "timeout", str(exc)
             finally:
                 history_target.call = original_call
-            applied = execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"])
+            applied = execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"], True)
             assert applied["operation"] == "no_change"
-            repeated = execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"])
+            repeated = execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"], True)
             assert repeated["target_id"] == applied["target_id"] and repeated["operation"] == "no_change"
             fixture.phone = "+12025550123"
             try:
-                execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"])
+                execute_contact(fixture.source, history_target, journal, 41, True, preview["digest"], True)
                 raise AssertionError("Unreviewed source changes must block")
             except Exception as exc:
                 assert str(exc) == "source_changed_regenerate_trial_plan", str(exc)
-            changed = execute_contact(fixture.source, history_target, journal, 41)
-            updated = execute_contact(fixture.source, history_target, journal, 41, True, changed["digest"])
+            changed = execute_contact(fixture.source, history_target, journal, 41, preserve_legacy_classification=True)
+            updated = execute_contact(fixture.source, history_target, journal, 41, True, changed["digest"], True)
             assert updated["operation"] == "update" and updated["target_id"] == applied["target_id"]
             assert all(op == "search_read" for _, op in fixture.calls)
         evidence = journal.connection.execute("SELECT kind,count(*) AS n FROM bambus_pilot.history_items GROUP BY kind ORDER BY kind").fetchall()
@@ -229,6 +280,8 @@ env.cr.commit()
             assert db.execute("SELECT record_count FROM bambus_migration_source").fetchone()[0] == 2
             assert db.execute("SELECT count(*) FROM mail_message WHERE model='res.partner' AND res_id=%s", (applied["target_id"],)).fetchone()[0] == 1
             assert db.execute("SELECT count(*) FROM ir_attachment WHERE res_model='res.partner' AND res_id=%s", (applied["target_id"],)).fetchone()[0] == 1
+            company_type = db.execute("SELECT is_company,bambus_legacy_classification,vat FROM res_partner WHERE id=%s", (applied["target_id"],)).fetchone()
+            assert company_type[:2] == (True, "company") and company_type[2] in (None, ""), company_type
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(executable_path=os.environ.get("CHROMIUM_PATH", "/usr/bin/chromium"), headless=True,
                                                   args=["--no-sandbox", "--disable-dev-shm-usage"])
@@ -245,11 +298,16 @@ env.cr.commit()
             page.get_by_text("Synthetic historical note", exact=False).first.wait_for(timeout=30000)
             page.get_by_text("original author: Synthetic author", exact=False).first.wait_for()
             page.get_by_text("synthetic.txt", exact=False).first.wait_for()
+            page.get_by_text("Imported company", exact=True).first.wait_for()
+            page.screenshot(path=str(output / "history-contact.png"), full_page=True)
+            (output / "history-contact.html").write_text(page.content())
+            page.locator("label:visible").filter(has_text="Imported contact type").first.wait_for()
+            assert page.locator('[name="bambus_legacy_classification"]').first.bounding_box()["y"] > page.locator('[name="vat"]').first.bounding_box()["y"]
             page.screenshot(path=str(output / "history-contact.png"), full_page=True)
             assert not errors, redact(str(errors))
             browser.close()
         print("History preview, lost-ack recovery, rerun, source-change guard, update and UI journal transfer passed.", flush=True)
-        (output / "result.json").write_text(json.dumps({"odoo_tests": int(summaries[-1][2]), "browser": "passed", "journal_transfer": "passed", "contact_history": "passed", "counts": list(counts)}, indent=2))
+        (output / "result.json").write_text(json.dumps({"odoo_tests": int(summaries[-1][2]), "browser": "passed", "journal_transfer": "passed", "contact_history": "passed", "company_without_tax_id": "passed", "addon_upgrade": "passed", "counts": list(counts)}, indent=2))
         return 0
     finally:
         if journal:
@@ -260,6 +318,8 @@ env.cr.commit()
         for name in (app, pg):
             subprocess.run(base + ["rm", "--force", name], env=docker_env, capture_output=True)
         subprocess.run(base + ["network", "rm", network], env=docker_env, capture_output=True)
+        import shutil
+        shutil.rmtree(previous)
 
 
 if __name__ == "__main__":

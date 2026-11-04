@@ -168,3 +168,78 @@ class TestContactHistoryTrial(TransactionCase):
         self.data["values"]["country_code"] = "OM"
         result = self.api.bambus_trial_apply(self.data)
         self.assertEqual(self.env["res.partner"].browse(result["target_id"]).country_id, self.env.ref("base.om"))
+
+    def test_explicit_preservation_imports_company_without_tax_and_sends_nothing(self):
+        self.data["values"].update(is_company=True, country_code="US")
+        before = self.counts()
+        self.assertEqual(self.api.bambus_trial_preview(self.data, preserve_legacy_classification=True)["classification_policy"], "preserve_source")
+        self.assertEqual(self.counts(), before)
+        result = self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        partner = self.env["res.partner"].browse(result["target_id"])
+        self.assertTrue(partner.is_company)
+        self.assertFalse(partner.vat)
+        self.assertEqual(partner.bambus_legacy_classification, "company")
+        self.assertEqual(tuple(a-b for a,b in zip(self.counts(), before)), (1, 1, 1, 3, 0, 0, 0, 0))
+        after = self.counts()
+        repeated = self.api.bambus_trial_apply(self.data, result["target_id"], result["items"], True)
+        self.assertEqual(repeated["operation"], "no_change")
+        self.assertEqual(self.counts(), after)
+
+    def test_non_imported_contacts_keep_native_classification(self):
+        normal = self.env["res.partner"].create({"name": "Native synthetic person"})
+        self.assertEqual(normal.bambus_legacy_classification, "native")
+        self.assertFalse(normal.is_company)
+        normal.write({"vat": "SYNTHETIC-TAX-001"})
+        self.assertTrue(normal.is_company)
+
+    def test_source_type_preservation_is_protected_even_from_forged_context(self):
+        result = self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        partner = self.api.browse(result["target_id"])
+        with self.assertRaises(AccessError):
+            partner.with_context(_bambus_classification_token=True).write({"bambus_legacy_classification": "company"})
+        with self.assertRaises(AccessError):
+            self.api.create({"name": "Forged imported company", "bambus_legacy_classification": "company"})
+
+    def test_preserved_source_person_and_policy_downgrade_guard(self):
+        self.data["values"].update(vat="SYNTHETIC-TAX-002")
+        result = self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        partner = self.env["res.partner"].browse(result["target_id"])
+        self.assertFalse(partner.is_company)
+        self.assertEqual(partner.bambus_legacy_classification, "person")
+        self.data["values"]["vat"] = ""
+        self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        with self.assertRaisesRegex(UserError, "classification_policy_requires_review"):
+            self.api.bambus_trial_apply(self.data)
+
+    def test_native_receipt_fingerprint_stays_compatible_on_opt_in_upgrade(self):
+        result = self.api.bambus_trial_apply(self.data)
+        partner = self.env["res.partner"].browse(result["target_id"])
+        expected = contract.digest({**self.data["values"], "ref": partner.ref})
+        self.assertEqual(self.api._bambus_fingerprint("contact", partner), expected)
+        updated = self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        self.assertEqual(updated["target_id"], result["target_id"])
+        self.assertEqual(updated["operation"], "update")
+        self.assertEqual(partner.bambus_legacy_classification, "person")
+
+    def test_preservation_still_requires_normal_contact_create_permissions(self):
+        self.data["values"]["is_company"] = True
+        with self.assertRaises(AccessError):
+            self.api.with_user(self.restricted).bambus_trial_apply(self.data, preserve_legacy_classification=True)
+
+    def test_changed_target_parent_requires_review_without_unlinking(self):
+        result = self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        partner = self.env["res.partner"].browse(result["target_id"])
+        parent = self.env["res.partner"].create({"name": "Synthetic target parent"})
+        partner.write({"parent_id": parent.id})
+        with self.assertRaises(UserError):
+            self.api.bambus_trial_apply(self.data, preserve_legacy_classification=True)
+        self.assertEqual(partner.parent_id, parent)
+
+    def test_rpc_defaults_cannot_inject_preserved_type_or_bypass_native_preview(self):
+        api = self.api.with_context(default_bambus_legacy_classification="company", _bambus_classification_token=True)
+        partner = api.create({"name": "Synthetic forged default"})
+        self.assertEqual(partner.bambus_legacy_classification, "native")
+        self.assertFalse(partner.is_company)
+        self.data["values"]["is_company"] = True
+        with self.assertRaisesRegex(UserError, "company_classification_requires_mapping"):
+            api.bambus_trial_preview(self.data)

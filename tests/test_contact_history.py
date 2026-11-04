@@ -20,6 +20,12 @@ class TestContactHistory(unittest.TestCase):
         self.assertEqual(contract.namespace(41), contract.namespace(41))
         self.assertNotEqual(contract.namespace(41), contract.namespace(42))
 
+    def test_reviewed_digest_binds_classification_policy_and_keeps_native_compatibility(self):
+        self.assertEqual(contract.review_digest(sample()), contract.digest(sample()))
+        self.assertNotEqual(contract.review_digest(sample(), True), contract.review_digest(sample(), False))
+        with self.assertRaises(ValueError):
+            contract.review_digest(sample(), 1)
+
     def test_contract_rejects_business_scope_expansion_and_recipients(self):
         for key in ("supplier_rank", "parent_id", "password"):
             data = sample()
@@ -59,6 +65,9 @@ class TestContactHistory(unittest.TestCase):
         for rows in ([], [row, row], [row] * 6):
             with self.assertRaises(PilotError):
                 validate_plan({"version": contract.VERSION, "contacts": rows})
+        self.assertEqual(validate_plan({"version": contract.VERSION, "contacts": [row], "preserve_legacy_classification": True}), [row])
+        with self.assertRaises(PilotError):
+            validate_plan({"version": contract.VERSION, "contacts": [row], "preserve_legacy_classification": "true"})
 
     def test_rpc_write_allowlist_is_separate_from_source(self):
         from migration_lab.preflight import ReadOnlyRPC

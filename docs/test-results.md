@@ -1,5 +1,30 @@
 # Test results — latest 2026-11-04
 
+## Explicit imported company/person preservation
+
+- 89 standard tests passed, 0 failures/errors/skips (5.292s): policy-bound review
+  digests differ from native plans, old native hashes/plans stay compatible and
+  only boolean policy values are accepted.
+- 46 native tests passed during a real previous-addon schema upgrade, 0 failed
+  or errors. Source companies without Tax ID remain companies only through
+  explicit preservation; ordinary contacts keep native computation. Direct,
+  forged-context/default and insufficient-ACL attempts cannot set imported type.
+  Default previews retain their guard. Existing receipt fingerprints are stable;
+  parent drift blocks without unlinking. Notification/rollback/history tests pass.
+- The owned test first installed public addon revision 935c53e (20.0.2.0.0),
+  imported a native-mode contact with a note/file, then upgraded current code to
+  20.0.3.0.0 before starting HTTP. IDs, history/file bytes and receipts survived;
+  preview returned no_change. No existing user database/volume was touched.
+- Full host worker with real PostgreSQL/native Odoo 20 and a synthetic Odoo 12
+  source passed default-mode rejection, opt-in blank-Tax-ID company import,
+  lost-ack recovery/rerun/update and metadata-only journal transfer. Chromium
+  verified original history/file and an Imported contact type row distinct from
+  Tax ID. No page errors. Result/logs/synthetic screenshots are ignored reports.
+
+This does not validate fiscal workflows or customer-specific/localization hooks.
+Actual local trial acceptance remains required. Optional integration tests now
+require Python 3.12, Docker/Chromium and Git history containing public 935c53e.
+
 ## Native validation fault diagnostics
 
 88 standard tests passed, 0 failures/errors/skips (4.777s). The new regression

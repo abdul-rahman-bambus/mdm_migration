@@ -1,5 +1,14 @@
 # Test results — latest 2026-11-04
 
+## Native validation fault diagnostics
+
+88 standard tests passed, 0 failures/errors/skips (4.777s). The new regression
+serializes native XML-RPC integer/bare and string-warning faults and verifies
+allowlisted classification errors reach the CLI, while unknown/private or
+extra-text faults remain generic. Addon/business mappings are unchanged; native
+container tests were not rerun for this host-only diagnostic fix. Uploaded logs
+were used privately for diagnosis and are not committed.
+
 ## Contact history trial
 
 - Standard suite: 87 tests passed, 0 failures/errors/skips (3.742s).

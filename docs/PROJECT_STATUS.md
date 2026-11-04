@@ -6,6 +6,10 @@ Main and private local review branches are unchanged; never push those archives.
 
 ## Implemented
 
+- Native bare UserError XML-RPC fault labels are recognized by the host worker,
+  including the company-classification blocker. Unknown/payload-bearing faults
+  remain generic. This fixes diagnostics only; classification mapping remains
+  blocked and no uploaded user logs are published.
 - Explicit 1–5 selected contact/history trial with reviewed-source-digest plans,
   read-only Odoo 12 extraction, atomic Odoo 20 contact/chatter/file imports and
   independent per-history ID/digest mappings. Original author labels and dates
@@ -33,7 +37,8 @@ Main and private local review branches are unchanged; never push those archives.
 
 ## Executed validation
 
-- 87 standard unit/protocol tests passed, 0 failures/errors/skips (3.742s).
+- 88 standard unit/protocol tests passed, 0 failures/errors/skips (4.777s),
+  including real XML-RPC fault serialization/decoding of bare native UserErrors.
 - 16 PostgreSQL/HTTP pilot integration tests passed (14.525s), including READ ONLY
   monitor export and preservation of stable identity on repeat initialization.
 - 40 native Odoo addon tests passed on official Odoo 20 (20.0-20261102), 0 failed

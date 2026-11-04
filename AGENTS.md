@@ -133,7 +133,7 @@ one authoritative journal for locking/idempotence. Mark success only after
 read-back reconciliation. Block source/target identity conflicts and target
 restore/missing-mapping situations for review; do not auto-delete/recreate them.
 
-Standard tests: python -m unittest discover -s tests -v (87 tests at this update).
+Standard tests: python -m unittest discover -s tests -v (88 tests at this update).
 Optional integration: python scripts/run_pilot_integration.py (16 tests), after
 installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
 container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
@@ -207,3 +207,6 @@ IDs/digests, lost-ack idempotence and restore/conflict guards. No automatic merg
 history edits/deletes, target overwrite after drift, or volume resets. Journal
 mirror receives safe counts only; raw business histories never enter Git or
 monitor metadata. See docs/contact-history-trial.md for limits and acceptance.
+Recognize only allowlisted UserError codes across bare/native and traceback RPC
+formats. Unknown fault text stays private. Diagnostic improvements must not
+silently bypass classification or other migration guards.

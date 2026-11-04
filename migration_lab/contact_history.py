@@ -125,9 +125,16 @@ class TrialRPC(ReadOnlyRPC):
         if isinstance(exc, xmlrpc.client.Fault):
             # Inspect faults only to recognize code-owned labels; never emit a
             # remote traceback, custom-module error, record name or field value.
+            # /xmlrpc/2 returns native UserError text as a bare faultString.
+            candidates = [exc.faultString.strip()]
+            if isinstance(exc.faultCode, str) and exc.faultCode.startswith("warning -- UserError\n\n"):
+                candidates.append(exc.faultCode.removeprefix("warning -- UserError\n\n").strip())
             match = re.search(r"(?:odoo\.exceptions\.)?UserError: ([a-z0-9_]+)\s*$", exc.faultString)
-            if match and match[1] in self.ERROR_CODES:
-                return match[1]
+            if match:
+                candidates.append(match[1])
+            for candidate in candidates:
+                if candidate in self.ERROR_CODES:
+                    return candidate
         return classify(exc)
 
 

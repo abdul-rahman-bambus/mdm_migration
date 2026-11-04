@@ -47,6 +47,13 @@ disable target computation or relabel the source just to make the import pass.
 Country codes must resolve uniquely; native VAT validation/normalization can
 also block apply/read-back. Parent/child relationships need a future mapping.
 
+If an older worker reports only rpc_fault, pull development: native Odoo 20
+can return the classification blocker as a bare XML-RPC UserError label. The
+updated worker recognizes only its static allowlist and still suppresses raw
+faults. This diagnostic fix does not resolve or bypass the classification
+disagreement. Check whether the source is a company/person and whether its Tax
+ID is empty or a placeholder; do not alter genuine source data to pass a trial.
+
 ## Upgrade and roles
 
 Use development and the existing activated virtual environment. Restore the

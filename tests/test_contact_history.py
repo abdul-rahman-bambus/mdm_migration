@@ -75,6 +75,24 @@ class TestContactHistory(unittest.TestCase):
         private = xmlrpc.client.Fault(1, "UserError: customer password private@example.invalid")
         self.assertEqual(rpc.failure_code(private), "rpc_fault")
 
+    def test_native_odoo_fault_formats_propagate_only_allowlisted_labels(self):
+        import xmlrpc.client
+        from unittest.mock import patch
+        from migration_lab.preflight import ProbeFailure, Settings
+        code = "trial_company_classification_requires_mapping"
+        faults = [xmlrpc.client.Fault(2, code),
+                  xmlrpc.client.Fault("warning -- UserError\n\n" + code, ""),
+                  xmlrpc.client.Fault(2, "private@example.invalid"),
+                  xmlrpc.client.Fault(2, code + " private@example.invalid")]
+        for fault, expected in zip(faults, [code, code, "rpc_fault", "rpc_fault"]):
+            rpc = TrialRPC(Settings("http://127.0.0.1:8020", "odoo20_migration", "synthetic", "synthetic"))
+            payload = xmlrpc.client.dumps(fault).encode()
+            with patch.object(rpc.opener, "open") as open_request:
+                open_request.return_value.__enter__.return_value.read.return_value = payload
+                with self.assertRaises(ProbeFailure) as caught:
+                    rpc.call("object", "execute_kw", "odoo20_migration", 2, "synthetic", "res.partner", "bambus_trial_preview", [], {})
+            self.assertEqual(str(caught.exception), expected)
+
     def test_source_extracts_tracking_attachment_and_original_date(self):
         source = object.__new__(Source)
         data = sample()

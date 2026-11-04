@@ -196,3 +196,7 @@ initialize the additive history journal table first. Follow the exact
 [contact-history trial runbook](docs/contact-history-trial.md) for selection,
 preview/apply/rerun, monitoring, preservation limits and conflict handling.
 The original synthetic-only pilot remains available with its original scope.
+
+The contact trial reports allowlisted native Odoo XML-RPC validation labels
+directly. A company-classification blocker requires mapping review; pulling a
+diagnostic fix does not change the record or bypass that guard.

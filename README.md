@@ -10,6 +10,12 @@ machine and is not connected to this cloud environment.
 
 ## Run the current tooling
 
+For a single-command Git pull + Docker custom-module upgrade, use
+`python3 scripts/update_odoo_module.py --odoo 20 --modules bambus_migration_control`.
+Both selected services must be running; the module must already be installed.
+See [Docker module updates](docs/docker-module-update.md) for preview, local edits,
+Odoo 12 limitations and failure handling. This does not initiate migration.
+
 Requirements: Python 3.12 (tested with 3.12.14). Assessment/schema tools and unit
 tests use the standard library. The optional contact pilot needs the pinned
 packages in requirements-pilot.txt and a separate PostgreSQL journal. From the repository root:

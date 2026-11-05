@@ -1,11 +1,16 @@
 # Project status
 
-Latest update: 2026-11-04 (Asia/Kolkata). Branch: development.
-Base for classification preservation increment: 935c53e. Use git log -1 --format=%H for the latest commit.
+Latest update: 2026-11-05 (Asia/Kolkata). Branch: development.
+Base for module helper increment: d921d50. Use git log -1 --format=%H for the latest commit.
 Main and private local review branches are unchanged; never push those archives.
 
 ## Implemented
 
+- Local Python 3.10+ Git/Docker module-update helper: explicit installed modules,
+  development-only fast-forward pull, optional local edits/no-op preview, version/
+  manifest/state checks, existing container credentials, upgrade before restart
+  and login-page readiness. Stops on errors; no resets or contact sync. Current
+  Odoo 12 custom mount limitations and separate core clones are documented.
 - Explicit --preserve-legacy-classification preview policy, bound into the
   reviewed plan digest. Imported company/person type is stored as protected
   provenance and drives a scoped compute extension; native contacts retain
@@ -45,8 +50,13 @@ Main and private local review branches are unchanged; never push those archives.
 
 ## Executed validation
 
-- 89 standard unit/protocol tests passed, 0 failures/errors/skips (5.292s),
-  including policy-bound digests, native-plan compatibility and safe fault decoding.
+- 98 standard unit/protocol/helper tests passed, 0 failures/errors/skips (5.736s).
+  New helper tests execute preflight with isolated manifest/DB fixtures and check
+  no restart after pull/preflight/upgrade errors, repository/readiness guards,
+  explicit module scope, version-specific commands and dry-run/local-edit paths.
+  Docker helper execution on the user's actual lab has not been performed here.
+  Previous native addon/PostgreSQL/browser evidence below is from 2026-11-04;
+  those checks were not rerun for this standalone deployment helper.
 - 16 PostgreSQL/HTTP pilot integration tests passed (14.525s), including READ ONLY
   monitor export and preservation of stable identity on repeat initialization.
 - 46 native Odoo addon upgrade tests passed on official Odoo 20 (20.0-20261102), 0 failed

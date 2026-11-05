@@ -133,7 +133,7 @@ one authoritative journal for locking/idempotence. Mark success only after
 read-back reconciliation. Block source/target identity conflicts and target
 restore/missing-mapping situations for review; do not auto-delete/recreate them.
 
-Standard tests: python -m unittest discover -s tests -v (89 tests at this update).
+Standard tests: python -m unittest discover -s tests -v (98 tests at this update).
 Optional integration: python scripts/run_pilot_integration.py (16 tests), after
 installing requirements-pilot.txt. It owns an isolated disposable PostgreSQL
 container with tmpfs/no named volume and synthetic HTTP servers; cleanup only
@@ -223,3 +223,17 @@ creates; default-mode previews must likewise use the explicit native policy.
 Top-level targets moved under another parent require review, not automatic
 unlinking or shared-parent updates. The integration runner also needs public
 commit 935c53e in local Git history for its previous-addon upgrade fixture.
+
+## Local module deployment helper
+
+scripts/update_odoo_module.py pulls development fast-forward only and upgrades
+explicit installed module names in the existing selected Docker lab container.
+Use its existing PGPASSWORD without inspecting/printing environment values. Never
+upgrade all, discard local changes, recreate containers/volumes, or restart after
+an unsuccessful upgrade. It requires the selected app running and PostgreSQL
+healthy. --skip-pull supports local edits; --dry-run performs no readiness checks
+or changes. This helper does not pull nested core Git clones or perform migration.
+Odoo 12 has no custom repository-addon mount in the current Compose setup; do not
+claim that the Odoo 20 tracking addon can be installed there. See
+docs/docker-module-update.md. Helper control-flow/preflight tests are isolated;
+actual execution on the user's laptop remains separate acceptance.

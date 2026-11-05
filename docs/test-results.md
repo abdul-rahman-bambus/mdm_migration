@@ -1,4 +1,20 @@
-# Test results — latest 2026-11-04
+# Test results — latest 2026-11-05
+
+## Git/Docker module-update helper
+
+98 standard tests passed, 0 failures/errors/skips (5.736s). Nine helper tests
+cover selected version/database/container command generation, explicit module
+scope, no changes in dry-run, local-edit mode, wrong branch/dirty checkout/
+stopped app/unready PostgreSQL guards, and no subsequent restart after failed
+pull/preflight/upgrade. The embedded container preflight executes with isolated
+module manifest and DB fixtures, including read-only installed-state lookup and
+wrong-major/uninstalled rejection. No user Docker service was contacted.
+
+The real CLI dry-run printed the expected source-based Odoo 20 command with
+--update=bambus_migration_control --stop-after-init --no-http and app-only restart,
+without passwords or mutations. Existing addon/native/PG/browser results below
+are prior evidence; they were not rerun for this helper-only change. Actual
+source-based Odoo 12/20 helper execution remains local acceptance work.
 
 ## Explicit imported company/person preservation
 
